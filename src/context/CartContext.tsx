@@ -1,126 +1,94 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import type { CartItem, Cart, Experience, PackageLevel } from "@/lib/types";
+import type { CartItem, Cart } from "@/lib/types";
 
 interface CartContextType {
   cart: Cart;
   addToCart: (item: Omit<CartItem, "totalPrice">) => void;
-  removeFromCart: (experienceId: string, date: string) => void;
-  updateQuantity: (experienceId: string, date: string, people: number) => void;
+  removeFromCart: (packageId: number, date: string) => void;
+  updateQuantity: (packageId: number, date: string, people: number) => void;
   clearCart: () => void;
   getItemCount: () => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const calculateItemTotal = (basePrice: number, people: number, multiplier: number): number => {
-  return basePrice * people * multiplier;
-};
-
-const calculateCartTotals = (items: CartItem[]): { subtotal: number; total: number } => {
-  const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
-  return { subtotal, total: subtotal }; // Could add taxes or fees here
-};
-
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, total: 0 });
+  const [cart, setCart] = useState<Cart>({ items: [], total: 0 });
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Cargar del localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem("ZenithMexico-cart");
     if (savedCart) {
       try {
-        const parsed = JSON.parse(savedCart);
-        setCart(parsed);
+        setCart(JSON.parse(savedCart));
       } catch (e) {
-        console.error("Error parsing cart:", e);
+        console.error("Error al parsear el carrito:", e);
       }
     }
     setIsHydrated(true);
   }, []);
 
-  // Save cart to localStorage on change
+  // Guardar en localStorage
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem("ZenithMexico-cart", JSON.stringify(cart));
     }
   }, [cart, isHydrated]);
 
-  const addToCart = (item: Omit<CartItem, "totalPrice">) => {
+  const calculateTotals = (items: CartItem[]) => {
+    return items.reduce((sum, item) => sum + item.totalPrice, 0);
+  };
+
+  const addToCart = (newItem: Omit<CartItem, "totalPrice">) => {
     setCart((prev) => {
-      // Check if item already exists
       const existingIndex = prev.items.findIndex(
-        (i) => i.experienceId === item.experienceId && i.date === item.date
+        (i) => i.packageId === newItem.packageId && i.date === newItem.date
       );
 
       let newItems: CartItem[];
+      const totalPrice = newItem.pricePerPerson * newItem.people;
 
       if (existingIndex >= 0) {
-        // Update existing item
         newItems = [...prev.items];
-        const totalPrice = calculateItemTotal(
-          item.experience.basePrice,
-          item.people,
-          item.packageLevel.multiplier
-        );
-        newItems[existingIndex] = { ...item, totalPrice };
+        newItems[existingIndex] = { ...newItem, totalPrice };
       } else {
-        // Add new item
-        const totalPrice = calculateItemTotal(
-          item.experience.basePrice,
-          item.people,
-          item.packageLevel.multiplier
-        );
-        newItems = [...prev.items, { ...item, totalPrice }];
+        newItems = [...prev.items, { ...newItem, totalPrice }];
       }
 
-      const totals = calculateCartTotals(newItems);
-      return { items: newItems, ...totals };
+      return { items: newItems, total: calculateTotals(newItems) };
     });
   };
 
-  const removeFromCart = (experienceId: string, date: string) => {
+  const removeFromCart = (packageId: number, date: string) => {
     setCart((prev) => {
       const newItems = prev.items.filter(
-        (item) => !(item.experienceId === experienceId && item.date === date)
+        (item) => !(item.packageId === packageId && item.date === date)
       );
-      const totals = calculateCartTotals(newItems);
-      return { items: newItems, ...totals };
+      return { items: newItems, total: calculateTotals(newItems) };
     });
   };
 
-  const updateQuantity = (experienceId: string, date: string, people: number) => {
+  const updateQuantity = (packageId: number, date: string, people: number) => {
     setCart((prev) => {
       const newItems = prev.items.map((item) => {
-        if (item.experienceId === experienceId && item.date === date) {
-          const totalPrice = calculateItemTotal(
-            item.experience.basePrice,
-            people,
-            item.packageLevel.multiplier
-          );
-          return { ...item, people, totalPrice };
+        if (item.packageId === packageId && item.date === date) {
+          return { ...item, people, totalPrice: item.pricePerPerson * people };
         }
         return item;
       });
-      const totals = calculateCartTotals(newItems);
-      return { items: newItems, ...totals };
+      return { items: newItems, total: calculateTotals(newItems) };
     });
   };
 
-  const clearCart = () => {
-    setCart({ items: [], subtotal: 0, total: 0 });
-  };
+  const clearCart = () => setCart({ items: [], total: 0 });
 
-  const getItemCount = () => {
-    return cart.items.length;
-  };
+  const getItemCount = () => cart.items.reduce((sum, item) => sum + item.people, 0);
 
   return (
-    <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, getItemCount }}
-    >
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, getItemCount }}>
       {children}
     </CartContext.Provider>
   );
@@ -128,8 +96,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
+  if (!context) throw new Error("useCart debe usarse dentro de un CartProvider");
   return context;
 }

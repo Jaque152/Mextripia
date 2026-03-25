@@ -87,9 +87,10 @@ export default function CotizarPage() {
 
       setQuoteCode(visualQuoteCode);
       setShowSuccess(true);
-    } catch (error: any) {
-      console.error("Error en cotización:", error.message || error);
-      alert(`Hubo un error: ${error.message || 'Intenta de nuevo.'}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      console.error("Error en cotización:", message);
+      alert(`Hubo un error: ${message}`);
     } finally {
       setIsSubmitting(false);
     }

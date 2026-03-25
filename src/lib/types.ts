@@ -1,115 +1,84 @@
 export interface Experience {
-  id: string;
+  id: number;
   title: string;
-  category?: string;
-  categorySlug?: string;
-  description?: string;
+  description: string;
   location: string;
   image_url: string;
-  images?: string[];
-  maxPeople?: number;
-  basePrice: number;
-  
+  category_id: number;
+  categories?: { name: string; slug: string }; // Para Joins
 }
 
-export interface PackageLevel {
-  id: string;
-  name: string;
-  multiplier: number;
-  includes: string[];
+export interface ServiceLevel {
+  id: number;
+  name: string; // Básico, Premium, Aventurero
 }
 
+export interface ActivityPackage {
+  id: number;
+  activity_id: number;
+  level_id: number;
+  price: number; // Este es el unit_price
+  features: string[]; // Viene del JSONB de la BD
+  service_levels?: { name: string }; // Para Joins
+}
+
+export interface Booking {
+  id: string; // UUID
+  customer_id: string;
+  total_amount: number;
+  payment_status: string;
+  created_at: string;
+  customer_email?: string;
+  // Campos de facturación
+  rfc?: string;
+  razon_social?: string;
+  direccion_facturacion?: string;
+  ciudad_facturacion?: string;
+  estado_facturacion?: string;
+  codigo_postal_facturacion?: string;
+}
+
+export interface BookingItem {
+  id: number;
+  booking_id: string;
+  package_id: number;
+  scheduled_date: string;
+  pax_qty: number; //número de personas
+  unit_price: number;
+  // Relación para el Dashboard
+  activity_packages?: {
+    features: string[];
+    activities: { title: string; location: string };
+  };
+}
+
+export interface CustomQuote {
+  id: number;
+  customer_name: string;
+  customer_email: string;
+  phone: string;
+  destination: string;
+  start_date: string;
+  end_date?: string;
+  pax_qty: number; // Número de personas en cotización
+  budget: string;
+  special_requests: string;
+  status: 'pending' | 'attended';
+  created_at: string;
+}
+
+// --- INTERFAZ DEL CARRITO ---
 export interface CartItem {
-  experienceId: string;
+  packageId: number; // Usamos el ID del paquete real de la BD
   experience: Experience;
+  levelName: string; // "Básico", "Premium", etc.
   date: string;
   people: number;
-  packageLevel: PackageLevel;
-  totalPrice: number;
+  pricePerPerson: number;
+  totalPrice: number; // (pricePerPerson * people)
 }
 
 export interface Cart {
   items: CartItem[];
-  subtotal: number;
   total: number;
 }
-
-export interface ContactInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-}
-
-export interface BillingInfo {
-  rfc?: string;
-  businessName?: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
-
-export interface Reservation {
-  id: string;
-  items: CartItem[];
-  contactInfo: ContactInfo;
-  billingInfo: BillingInfo;
-  total: number;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
-  createdAt: string;
-}
-
-export interface QuoteRequest {
-  id: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  travelers: number;
-  budget: string;
-  requirements: string;
-  contactInfo: ContactInfo;
-  status: "pending" | "contacted" | "quoted" | "closed";
-  createdAt: string;
-}
-
-export const PACKAGE_LEVELS: PackageLevel[] = [
-  {
-    id: "basico",
-    name: "Básico",
-    multiplier: 1,
-    includes: [
-      "Transporte incluido",
-      "Guía local certificado",
-      "Seguro de viaje básico",
-      "Soporte por WhatsApp"
-    ]
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    multiplier: 1.8,
-    includes: [
-      "Transporte premium",
-      "Guía local certificado",
-      "Seguro de viaje completo",
-      "Hospedaje incluido",
-      "Comidas típicas",
-      "Soporte 24/7"
-    ]
-  },
-  {
-    id: "aventurero",
-    name: "Aventurero",
-    multiplier: 2.5,
-    includes: [
-      "Transporte VIP",
-      "Guía personal dedicado",
-      "Seguro premium todo riesgo",
-      "Hospedaje 5 estrellas",
-      "Todas las comidas",
-      "Actividades exclusivas",
-      "Recuerdos personalizados"
-    ]
-  }
-];

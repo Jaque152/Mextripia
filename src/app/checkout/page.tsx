@@ -10,10 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
-import {
-  ChevronLeft, User, CreditCard, FileText,
-  Lock, CheckCircle, Calendar, Users, Loader2
-} from "lucide-react";
+import { CheckCircle, Loader2, User, FileText, ChevronLeft, Lock } from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -22,58 +19,24 @@ export default function CheckoutPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState("");
 
-  const [contactInfo, setContactInfo] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
-
-  const [billingInfo, setBillingInfo] = useState({
-    rfc: "",
-    businessName: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-  });
-
+  const [contactInfo, setContactInfo] = useState({ firstName: "", lastName: "", email: "", phone: "" });
+  const [billingInfo, setBillingInfo] = useState({ rfc: "", businessName: "", address: "" });
   const [needsInvoice, setNeedsInvoice] = useState(false);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency", currency: "MXN", minimumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + "T00:00:00");
-    return date.toLocaleDateString("es-MX", {
-      day: "numeric", month: "short", year: "numeric",
-    });
-  };
+  const formatPrice = (price: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(price);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) return;
     setIsProcessing(true);
 
     try {
-      // 1. Manejar el Cliente (Upsert)
       const { data: customer, error: custError } = await supabase
         .from('customers')
-        .upsert({
-          first_name: contactInfo.firstName,
-          last_name: contactInfo.lastName,
-          email: contactInfo.email,
-          phone: contactInfo.phone
-        }, { onConflict: 'email' })
-        .select()
-        .single();
+        .upsert({ first_name: contactInfo.firstName, last_name: contactInfo.lastName, email: contactInfo.email, phone: contactInfo.phone }, { onConflict: 'email' })
+        .select().single();
 
       if (custError) throw custError;
 
-      // 2. Insertar Reserva en 'bookings'
       const { data: booking, error: bookError } = await supabase
         .from('bookings')
         .insert({
@@ -82,99 +45,67 @@ export default function CheckoutPage() {
           payment_status: 'paid',
           rfc: needsInvoice ? billingInfo.rfc : null,
           razon_social: needsInvoice ? billingInfo.businessName : null,
-          direccion_facturacion: needsInvoice ? billingInfo.address : null,
-          ciudad_facturacion: needsInvoice ? billingInfo.city : null,
-          estado_facturacion: needsInvoice ? billingInfo.state : null,
-          codigo_postal_facturacion: needsInvoice ? billingInfo.zipCode : null
+          direccion_facturacion: needsInvoice ? billingInfo.address : null
         })
-        .select()
-        .single();
+        .select().single();
 
       if (bookError) throw bookError;
 
-      // 3. Insertar Items en 'booking_items'
       for (const item of cart.items) {
-        const { data: pkgData } = await supabase
-          .from('activity_packages')
-          .select('id')
-          .eq('activity_id', parseInt(item.experienceId))
-          .eq('level_id', item.packageLevel.name === 'Básico' ? 1 : (item.packageLevel.name === 'Premium' ? 2 : 3))
-          .single();
-
-        const { error: itemError } = await supabase
-          .from('booking_items')
-          .insert({
-            booking_id: booking.id,
-            package_id: pkgData?.id || 1,
-            scheduled_date: item.date,
-            pax_qty: item.people,
-            unit_price: item.totalPrice / item.people
-          });
-
-        if (itemError) throw itemError;
+        await supabase.from('booking_items').insert({
+          booking_id: booking.id,
+          package_id: item.packageId,
+          scheduled_date: item.date,
+          pax_qty: item.people,
+          unit_price: item.pricePerPerson
+        });
       }
 
-      // 4. Generar código visual antes de enviarlo por correo
       const visualCode = `RES-${booking.id.slice(0, 8).toUpperCase()}`;
-
-      // 5. Enviar correo de confirmación de compra
-      const purchaseEmailData = {
-        type: 'PURCHASE',
-        email: contactInfo.email,
-        customerName: `${contactInfo.firstName} ${contactInfo.lastName}`,
-        resCode: visualCode, // Corregido: Ahora usa la variable visualCode
-        items: cart.items.map(item => ({
-          experience_title: item.experience.title,
-          travel_date: formatDate(item.date),
-          pax_qty: item.people,
-          package_name: item.packageLevel.name,
-          subtotal: formatPrice(item.totalPrice),
-          image_url: item.experience.images ? item.experience.images[0] : (item.experience.image_url || "")
-        })),
-        total: formatPrice(cart.total)
-      };
-
+      setConfirmationCode(visualCode);
+      
+      // Llamada al API de correo (opcional, igual que tenías)
       await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(purchaseEmailData),
+        body: JSON.stringify({
+          type: 'PURCHASE',
+          email: contactInfo.email,
+          customerName: contactInfo.firstName,
+          resCode: visualCode,
+          items: cart.items.map(i => ({
+            experience_title: i.experience.title,
+            travel_date: i.date,
+            pax_qty: i.people,
+            package_name: i.levelName,
+            subtotal: formatPrice(i.totalPrice)
+          })),
+          total: formatPrice(cart.total)
+        }),
       });
 
-      setConfirmationCode(visualCode);
       setShowSuccess(true);
       clearCart();
-
     } catch (error) {
-      console.error("Error en checkout:", error);
-      alert("Error al procesar la reserva. Verifica la consola para más detalles.");
+      console.error(error);
+      alert("Error al procesar reserva.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const isFormValid = contactInfo.firstName && contactInfo.lastName && contactInfo.email && contactInfo.phone;
+  const isFormValid = contactInfo.firstName && contactInfo.email && contactInfo.phone;
 
-  // Render de Éxito y Formulario se mantienen igual que tu diseño...
   if (showSuccess) {
     return (
       <div className="min-h-screen flex flex-col bg-stone-50">
         <Header />
         <main className="flex-1 pt-32 flex items-center justify-center px-4">
-          <Card className="max-w-lg w-full border-none shadow-2xl">
-            <CardContent className="p-10 text-center">
-              <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
-              <h1 className="text-3xl font-serif font-bold mb-3">¡Reservación Confirmada!</h1>
-              <p className="text-stone-Stone-500 mb-8">
-                Tu reserva ha sido registrada para <strong>{contactInfo.email}</strong>.
-              </p>
-              <div className="p-6 bg-orange-50 rounded-2xl mb-8 border border-orange-100">
-                <p className="text-xs font-bold text-orange-700 uppercase mb-2">Código de Reservación</p>
-                <p className="font-mono text-2xl font-black text-orange-900">{confirmationCode}</p>
-              </div>
-              <Button asChild className="w-full h-12 rounded-full bg-orange-400">
-                <Link href="/">Volver al Inicio</Link>
-              </Button>
-            </CardContent>
+          <Card className="max-w-lg w-full text-center p-10 shadow-2xl">
+            <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
+            <h1 className="text-3xl font-serif font-bold mb-3">¡Reservación Confirmada!</h1>
+            <p className="mb-8">Código: <span className="font-mono font-bold">{confirmationCode}</span></p>
+            <Button asChild className="w-full bg-orange-400 rounded-full"><Link href="/">Volver al Inicio</Link></Button>
           </Card>
         </main>
         <Footer />
@@ -182,62 +113,35 @@ export default function CheckoutPage() {
     );
   }
 
-  // Seccion de retorno principal del componente...
   return (
     <div className="min-h-screen flex flex-col bg-stone-50/50">
       <Header />
       <main className="flex-1 pt-20">
-        <div className="container mx-auto px-4 py-8 lg:py-12">
+        <div className="container mx-auto px-4 py-12">
           <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
-              <Card><CardContent className="p-6">
-                <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2"><User className="text-orange-600"/> Datos de Contacto</h2>
+              <Card className="p-6">
+                <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2"><User className="text-orange-600"/> Contacto</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Input value={contactInfo.firstName} onChange={(e)=>setContactInfo({...contactInfo, firstName:e.target.value})} placeholder="Nombre *" required />
-                  <Input value={contactInfo.lastName} onChange={(e)=>setContactInfo({...contactInfo, lastName:e.target.value})} placeholder="Apellidos *" required />
+                  <Input value={contactInfo.lastName} onChange={(e)=>setContactInfo({...contactInfo, lastName:e.target.value})} placeholder="Apellidos" />
                   <Input type="email" value={contactInfo.email} onChange={(e)=>setContactInfo({...contactInfo, email:e.target.value})} placeholder="Email *" required />
                   <Input type="tel" value={contactInfo.phone} onChange={(e)=>setContactInfo({...contactInfo, phone:e.target.value})} placeholder="Teléfono *" required />
                 </div>
-              </CardContent></Card>
-
-              <Card><CardContent className="p-6">
+              </Card>
+              <Card className="p-6">
                 <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2"><FileText className="text-orange-600"/> Facturación</h2>
-                <label className="flex items-center gap-2 mb-6 cursor-pointer">
-                  <input type="checkbox" checked={needsInvoice} onChange={(e)=>setNeedsInvoice(e.target.checked)} className="w-4 h-4" />
-                  <span className="text-sm">Requiero factura</span>
-                </label>
-                {needsInvoice && (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input value={billingInfo.rfc} onChange={(e)=>setBillingInfo({...billingInfo, rfc:e.target.value})} placeholder="RFC" />
-                    <Input value={billingInfo.businessName} onChange={(e)=>setBillingInfo({...billingInfo, businessName:e.target.value})} placeholder="Razón Social" />
-                    <Input className="sm:col-span-2" value={billingInfo.address} onChange={(e)=>setBillingInfo({...billingInfo, address:e.target.value})} placeholder="Dirección" />
-                  </div>
-                )}
-              </CardContent></Card>
+                <label className="flex items-center gap-2 mb-4 cursor-pointer"><input type="checkbox" checked={needsInvoice} onChange={(e)=>setNeedsInvoice(e.target.checked)} /> Requiero factura</label>
+                {needsInvoice && <div className="grid sm:grid-cols-2 gap-4"><Input placeholder="RFC" onChange={(e)=>setBillingInfo({...billingInfo, rfc:e.target.value})} /><Input placeholder="Razón Social" onChange={(e)=>setBillingInfo({...billingInfo, businessName:e.target.value})} /></div>}
+              </Card>
             </div>
-
             <div className="lg:col-span-1">
-              <Card className="sticky top-28 shadow-xl">
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-serif font-semibold mb-6">Resumen</h2>
-                  {cart.items.map((item) => (
-                    <div key={item.experienceId} className="flex gap-4 mb-4">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold truncate">{item.experience.title}</p>
-                        <p className="text-[10px] text-stone-500">{item.people}p • {formatDate(item.date)}</p>
-                      </div>
-                      <p className="text-xs font-bold">{formatPrice(item.totalPrice)}</p>
-                    </div>
-                  ))}
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex justify-between text-xl font-bold text-orange-700">
-                      <span>Total</span><span>{formatPrice(cart.total)}</span>
-                    </div>
-                    <Button type="submit" disabled={!isFormValid || isProcessing} className="w-full mt-6 bg-orange-400 h-12 rounded-full">
-                      {isProcessing ? <Loader2 className="animate-spin" /> : "Confirmar Reserva"}
-                    </Button>
-                  </div>
-                </CardContent>
+              <Card className="p-6 sticky top-28">
+                <h2 className="text-xl font-serif font-semibold mb-6">Resumen</h2>
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between text-xl font-bold text-orange-700"><span>Total</span><span>{formatPrice(cart.total)}</span></div>
+                  <Button type="submit" disabled={!isFormValid || isProcessing} className="w-full mt-6 bg-orange-400 h-12 rounded-full">{isProcessing ? <Loader2 className="animate-spin" /> : "Confirmar Reserva"}</Button>
+                </div>
               </Card>
             </div>
           </form>

@@ -6,7 +6,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // IMPORTANTE: En modo prueba (sin dominio comprado),
 // Resend solo deja enviar aL correo de registro.
 const DEMO_RECIPIENT_EMAIL = 'jaknet.software.dev@gmail.com';
-
+interface EmailItem {
+  experience_title: string;
+  travel_date: string;
+  pax_qty: number;
+  package_name: string;
+  subtotal: string;
+}
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -49,7 +55,7 @@ export async function POST(req: Request) {
                 </tr>
               </thead>
               <tbody>
-                ${items.map((item: any) => `
+                ${items.map((item: EmailItem) => `
                   <tr style="border-bottom: 1px solid #f3f4f6;">
                     <td style="padding: 15px 0;">
                       <p style="margin: 0; font-weight: bold; color: #1c1917;">${item.experience_title}</p>

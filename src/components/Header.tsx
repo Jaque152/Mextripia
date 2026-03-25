@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Menu, Globe, Trash2 } from "lucide-react";
+import { ShoppingCart, Menu, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ const navLinks = [
 export function Header() {
   const [language, setLanguage] = useState<"ES" | "EN">("ES");
   const [showMiniCart, setShowMiniCart] = useState(false);
-  const { cart, removeFromCart, getItemCount } = useCart();
+  const { cart, getItemCount } = useCart();
   const itemCount = getItemCount();
 
   const formatPrice = (price: number) => {
@@ -38,7 +38,7 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo Limpio */}
+          {/* Logo*/}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-14 h-14 flex items-center justify-center p-1 transition-transform duration-300 group-hover:scale-110">
               <img 
@@ -114,12 +114,12 @@ export function Header() {
                     <>
                       <div className="max-h-64 overflow-y-auto">
                         {cart.items.slice(0, 3).map((item) => (
-                          <div key={`${item.experienceId}-${item.date}`} className="p-3 border-b border-border/50">
+                          <div key={`${item.packageId}-${item.date}`} className="p-3 border-b border-border/50">
                             <div className="flex gap-3">
                               <img src={item.experience.image_url} className="w-12 h-12 rounded object-cover" alt="" />
                               <div className="flex-1 min-w-0">
                                 <h4 className="text-xs font-medium truncate">{item.experience.title}</h4>
-                                <p className="text-[10px] text-muted-foreground">{item.people}p • {item.packageLevel.name}</p>
+                                <p className="text-[10px] text-muted-foreground">{item.people}p • {item.levelName}</p>
                                 <p className="text-xs font-semibold text-primary">{formatPrice(item.totalPrice)}</p>
                               </div>
                             </div>

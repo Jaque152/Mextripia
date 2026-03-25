@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/Header";
@@ -10,14 +10,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from '@/lib/supabase';
-import { MapPin, Search, X, ArrowRight, Loader2 } from "lucide-react";
+import { MapPin, Search, ArrowRight, Loader2 } from "lucide-react";
+import { Experience } from "@/lib/types";
 
-export default function ExperienciasPage() {
+type ExperienceWithPrice = Experience & { displayPrice: number };
+
+interface SupabaseExperienceResponse {
+  id: number;
+  title: string;
+  description: string;
+  location: string;
+  image_url: string;
+  category_id: number;
+  categories: { name: string; slug: string } | null;
+  activity_packages: { price: number }[];
+}
+
+function ExperienciasContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("categoria");
 
-  const [experiences, setExperiences] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [experiences, setExperiences] = useState<ExperienceWithPrice[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string; slug: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,32 +39,44 @@ export default function ExperienciasPage() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      
-      // Traer Categorías reales
-      const { data: catData } = await supabase.from('categories').select('*');
-      if (catData) setCategories(catData);
+      try {
+        const { data: catData } = await supabase.from('categories').select('*');
+        if (catData) setCategories(catData);
 
-      // Traer Experiencias con sus categorías y precios
-      const { data: actData } = await supabase
-        .from('activities')
-        .select(`
-          *,
-          categories (name, slug),
-          activity_packages (price)
-        `);
-      
-      if (actData) setExperiences(actData);
-      setLoading(false);
+        const { data: actData } = await supabase
+          .from('activities')
+          .select(`
+            id, title, description, location, image_url, category_id,
+            categories (name, slug),
+            activity_packages (price)
+          `);
+
+        if (actData) {
+          const mappedData: ExperienceWithPrice[] = (actData as unknown as SupabaseExperienceResponse[]).map((item) => ({
+            id: item.id,
+            title: item.title,
+            description: item.description || "",
+            location: item.location,
+            image_url: item.image_url,
+            category_id: item.category_id,
+            categories: item.categories || undefined,
+            displayPrice: item.activity_packages?.[0]?.price || 0
+          }));
+          setExperiences(mappedData);
+        }
+      } catch (error) {
+        console.error("Error fetchData:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchData();
   }, []);
 
-  // Sincronizar con el parámetro de la URL si cambia
   useEffect(() => {
     if (categoryParam) setSelectedCategory(categoryParam);
   }, [categoryParam]);
 
-  // FILTRADO 
   const filteredExperiences = experiences.filter((exp) => {
     const matchesCategory = !selectedCategory || exp.categories?.slug === selectedCategory;
     const matchesSearch = !searchTerm ||
@@ -62,15 +88,13 @@ export default function ExperienciasPage() {
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
-      minimumFractionDigits: 0,
+      style: "currency", currency: "MXN", minimumFractionDigits: 0,
     }).format(price);
   };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      <Loader2 className="w-10 h-10 animate-spin text-orange-600" />
     </div>
   );
 
@@ -78,13 +102,13 @@ export default function ExperienciasPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-20">
-        <section className="bg-gradient-to-br from-secondary/50 via-background to-secondary/30 py-16">
+        <section className="bg-stone-50 py-16">
           <div className="container mx-auto px-4 lg:px-8">
             <Badge variant="outline" className="mb-4 rounded-full px-4 py-1 border-primary/30 text-primary">
               Catálogo de Experiencias
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-6">
-              Descubre <span className="text-gradient">aventuras únicas</span>
+            <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-6 text-stone-900">
+              Descubre <span className="text-orange-600">aventuras únicas</span>
             </h1>
           </div>
         </section>
@@ -127,10 +151,12 @@ export default function ExperienciasPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredExperiences.map((exp) => (
                 <Link key={exp.id} href={`/experiencias/${exp.id}`} className="group">
-                  <Card className="h-full overflow-hidden hover:shadow-xl transition-all">
+                  <Card className="h-full overflow-hidden hover:shadow-xl transition-all border-none shadow-sm rounded-2xl">
                     <div className="aspect-[4/3] relative overflow-hidden">
                       <img src={exp.image_url} alt={exp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      <Badge className="absolute top-4 left-4 bg-background/90 text-foreground">{exp.categories?.name}</Badge>
+                      <Badge className="absolute top-4 left-4 bg-background/90 text-foreground border-none">
+                        {exp.categories?.name}
+                      </Badge>
                     </div>
                     <CardContent className="p-5">
                       <h3 className="text-lg font-serif font-semibold mb-2">{exp.title}</h3>
@@ -139,12 +165,12 @@ export default function ExperienciasPage() {
                       </div>
                       <div className="flex items-center justify-between pt-4 border-t">
                         <div>
-                          <p className="text-xs text-muted-foreground">Desde</p>
-                          <p className="text-lg font-semibold text-primary">
-                            {formatPrice(exp.activity_packages?.[0]?.price || 0)}
+                          <p className="text-xs text-muted-foreground uppercase font-bold">Desde</p>
+                          <p className="text-lg font-bold text-orange-600">
+                            {formatPrice(exp.displayPrice)}
                           </p>
                         </div>
-                        <span className="flex items-center gap-1 text-sm text-primary font-medium">
+                        <span className="flex items-center gap-1 text-sm text-primary font-medium group-hover:translate-x-1 transition-transform">
                           Ver detalles <ArrowRight className="w-4 h-4" />
                         </span>
                       </div>
@@ -158,5 +184,17 @@ export default function ExperienciasPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function ExperienciasPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-orange-600" />
+      </div>
+    }>
+      <ExperienciasContent />
+    </Suspense>
   );
 }
