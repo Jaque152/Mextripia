@@ -56,44 +56,53 @@ export default function CarritoPage() {
           ) : (
             <div className="grid lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
-                {cart.items.map((item) => (
-                  <Card key={`${item.packageId}-${item.date}`} className="overflow-hidden">
-                    <CardContent className="p-0 flex flex-col sm:flex-row">
-                      <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
-                        <img src={item.experience.image_url} alt={item.experience.title} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 p-5">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <Badge variant="secondary" className="mb-2">{item.levelName}</Badge>
-                            <h3 className="text-lg font-serif font-semibold">{item.experience.title}</h3>
+                {cart.items.map((item) => {
+                  // Extraer la primera imagen del arreglo JSONB
+                  const itemImage = item.experience.images && item.experience.images.length > 0 
+                                      ? item.experience.images[0] 
+                                      : '/placeholder.jpg';
+                  
+                  return (
+                    <Card key={`${item.packageId}-${item.date}`} className="overflow-hidden">
+                      <CardContent className="p-0 flex flex-col sm:flex-row">
+                        <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
+                          <img src={itemImage} alt={item.experience.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 p-5">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <Badge variant="secondary" className="mb-2">{item.levelName}</Badge>
+                              <h3 className="text-lg font-serif font-semibold">{item.experience.title}</h3>
+                            </div>
+                            <button onClick={() => removeFromCart(item.packageId, item.date)} className="text-muted-foreground hover:text-destructive">
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </div>
-                          <button onClick={() => removeFromCart(item.packageId, item.date)} className="text-muted-foreground hover:text-destructive">
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-stone-500 mb-4">
-                          <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {item.experience.location}</span>
-                          <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(item.date)}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4 bg-stone-50 p-1 rounded-md border">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.packageId, item.date, item.people - 1)} disabled={item.people <= 1}><Minus className="w-3 h-3" /></Button>
-                            <span className="font-bold">{item.people}</span>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.packageId, item.date, item.people + 1)}><Plus className="w-3 h-3" /></Button>
+                          <div className="flex flex-wrap gap-4 text-sm text-stone-500 mb-4">
+                            <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {item.experience.location}</span>
+                            <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(item.date)}</span>
                           </div>
-                          <p className="text-xl font-bold text-primary">{formatPrice(item.totalPrice)}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 bg-stone-50 p-1 rounded-md border">
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.packageId, item.date, item.people - 1)} disabled={item.people <= 1}><Minus className="w-3 h-3" /></Button>
+                              <span className="font-bold">{item.people}</span>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.packageId, item.date, item.people + 1)}><Plus className="w-3 h-3" /></Button>
+                            </div>
+                            <p className="text-xl font-bold text-primary">{formatPrice(item.totalPrice)}</p>
+                            <p className="text-[10px] text-stone-500">IVA incluido</p>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
               <div className="lg:col-span-1">
                 <Card className="sticky top-28 p-6">
                   <h2 className="text-xl font-serif font-semibold mb-6">Resumen</h2>
                   <div className="flex justify-between text-lg font-bold mb-6 pt-4 border-t">
                     <span>Total</span><span className="text-primary">{formatPrice(cart.total)}</span>
+                    <span className="text-xs font-normal text-stone-500">IVA incluido</span>
                   </div>
                   <Button asChild className="w-full h-12 rounded-full"><Link href="/checkout">Proceder al Pago <ArrowRight className="ml-2 w-5 h-5" /></Link></Button>
                 </Card>

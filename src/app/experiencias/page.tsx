@@ -13,18 +13,20 @@ import { supabase } from '@/lib/supabase';
 import { MapPin, Search, ArrowRight, Loader2 } from "lucide-react";
 import { Experience } from "@/lib/types";
 
-type ExperienceWithPrice = Experience & { displayPrice: number };
-
+// Interfaz auxiliar adaptada a la BD
 interface SupabaseExperienceResponse {
   id: number;
   title: string;
+  slug: string;
   description: string;
   location: string;
-  image_url: string;
+  images: string[]; 
   category_id: number;
-  categories: { name: string; slug: string } | null;
+  categories: { id: number; name: string; slug: string } | null;
   activity_packages: { price: number }[];
 }
+
+type ExperienceWithPrice = Experience & { displayPrice: number };
 
 function ExperienciasContent() {
   const searchParams = useSearchParams();
@@ -43,11 +45,12 @@ function ExperienciasContent() {
         const { data: catData } = await supabase.from('categories').select('*');
         if (catData) setCategories(catData);
 
+        // Actualizamos el select para traer "images"
         const { data: actData } = await supabase
           .from('activities')
           .select(`
-            id, title, description, location, image_url, category_id,
-            categories (name, slug),
+            id, title, slug, description, location, images, category_id,
+            categories (id, name, slug),
             activity_packages (price)
           `);
 
@@ -55,9 +58,10 @@ function ExperienciasContent() {
           const mappedData: ExperienceWithPrice[] = (actData as unknown as SupabaseExperienceResponse[]).map((item) => ({
             id: item.id,
             title: item.title,
+            slug: item.slug,
             description: item.description || "",
             location: item.location,
-            image_url: item.image_url,
+            images: item.images || [], 
             category_id: item.category_id,
             categories: item.categories || undefined,
             displayPrice: item.activity_packages?.[0]?.price || 0
@@ -149,35 +153,41 @@ function ExperienciasContent() {
         <section className="py-12">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredExperiences.map((exp) => (
-                <Link key={exp.id} href={`/experiencias/${exp.id}`} className="group">
-                  <Card className="h-full overflow-hidden hover:shadow-xl transition-all border-none shadow-sm rounded-2xl">
-                    <div className="aspect-[4/3] relative overflow-hidden">
-                      <img src={exp.image_url} alt={exp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      <Badge className="absolute top-4 left-4 bg-background/90 text-foreground border-none">
-                        {exp.categories?.name}
-                      </Badge>
-                    </div>
-                    <CardContent className="p-5">
-                      <h3 className="text-lg font-serif font-semibold mb-2">{exp.title}</h3>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
-                        <MapPin className="w-4 h-4" /> {exp.location}
+              {filteredExperiences.map((exp) => {
+                // Extraer la primera imagen de forma segura
+                const thumbImage = exp.images?.length > 0 ? exp.images[0] : '/placeholder.jpg';
+
+                return (
+                  <Link key={exp.id} href={`/experiencias/${exp.id}`} className="group">
+                    <Card className="h-full overflow-hidden hover:shadow-xl transition-all border-none shadow-sm rounded-2xl">
+                      <div className="aspect-[4/3] relative overflow-hidden">
+                        <img src={thumbImage} alt={exp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <Badge className="absolute top-4 left-4 bg-background/90 text-foreground border-none">
+                          {exp.categories?.name}
+                        </Badge>
                       </div>
-                      <div className="flex items-center justify-between pt-4 border-t">
-                        <div>
-                          <p className="text-xs text-muted-foreground uppercase font-bold">Desde</p>
-                          <p className="text-lg font-bold text-orange-600">
-                            {formatPrice(exp.displayPrice)}
-                          </p>
+                      <CardContent className="p-5">
+                        <h3 className="text-lg font-serif font-semibold mb-2">{exp.title}</h3>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
+                          <MapPin className="w-4 h-4" /> {exp.location}
                         </div>
-                        <span className="flex items-center gap-1 text-sm text-primary font-medium group-hover:translate-x-1 transition-transform">
-                          Ver detalles <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                        <div className="flex items-center justify-between pt-4 border-t">
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase font-bold">Desde</p>
+                            <p className="text-lg font-bold text-orange-600">
+                              {formatPrice(exp.displayPrice)}
+                            </p>
+                            <span className="text-xs font-normal text-stone-500">IVA incluido</span>
+                          </div>
+                          <span className="flex items-center gap-1 text-sm text-primary font-medium group-hover:translate-x-1 transition-transform">
+                            Ver detalles <ArrowRight className="w-4 h-4" />
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

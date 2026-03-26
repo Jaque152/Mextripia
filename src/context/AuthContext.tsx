@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Simulated admin credentials
 const ADMIN_CREDENTIALS = {
-  email: "admin@zenithmexico.com.mx",
+  email: "zenithmex.com",
   password: "admin123"
 };
 

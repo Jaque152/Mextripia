@@ -23,7 +23,7 @@ const sections = [
   },
   {
     heading: "6. Proceso de Solicitud",
-    content: "Para solicitar una cancelación o modificación, comuníquese con nuestro equipo de atención al cliente a través del correo electrónico informes@zenithmexico.com.mx o al teléfono +52 55 5555 5555. Nuestro horario de atención es de lunes a viernes de 9:00 a 18:00 horas."
+    content: "Para solicitar una cancelación o modificación, comuníquese con nuestro equipo de atención al cliente a través del correo electrónico informes@zenithmex.com o al teléfono +52 55 5555 5555. Nuestro horario de atención es de lunes a viernes de 9:00 a 18:00 horas."
   }
 ];
 

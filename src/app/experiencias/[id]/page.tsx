@@ -50,9 +50,15 @@ export default function ExperienceDetailPage() {
           setExperience({
             id: activity.id,
             title: activity.title,
+            slug: activity.slug, // Añadido
             description: activity.description,
             location: activity.location,
-            image_url: activity.image_url,
+            duration: activity.duration, // Añadido
+            images: activity.images || [], // Reemplaza image_url
+            itinerary: activity.itinerary,
+            requirements: activity.requirements,
+            restrictions: activity.restrictions,
+            included_general: activity.included_general,
             category_id: activity.category_id,
             categories: activity.categories
           });
@@ -112,6 +118,12 @@ export default function ExperienceDetailPage() {
 
   if (!experience) return null;
 
+  // Extraer imagen principal de forma segura
+  const mainImage = experience.images?.length > 0 ? experience.images[0] : '/placeholder.jpg';
+  
+  // Extraer las inclusiones específicas del paquete (ahora vienen del JSON features.incluye)
+  const packageInclusions = selectedPackage?.features?.incluye || [];
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -121,7 +133,7 @@ export default function ExperienceDetailPage() {
             
             <div className="lg:col-span-2 space-y-8">
               <div className="aspect-[16/9] rounded-3xl overflow-hidden shadow-xl bg-stone-100">
-                <img src={experience.image_url} alt={experience.title} className="w-full h-full object-cover" />
+                <img src={mainImage} alt={experience.title} className="w-full h-full object-cover" />
               </div>
 
               <div>
@@ -137,17 +149,36 @@ export default function ExperienceDetailPage() {
                 <p className="text-lg text-stone-600 leading-relaxed">{experience.description}</p>
               </div>
 
+              {/* OPCIONAL: Mostrar lo que incluye en GENERAL (de la tabla activities) */}
+              {experience.included_general && experience.included_general.length > 0 && (
+                <div className="pt-8 border-t border-stone-100">
+                  <h2 className="text-2xl font-serif font-bold mb-6">Lo que incluye esta experiencia</h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {experience.included_general.map((item, index) => (
+                      <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-stone-50 border border-stone-100">
+                        <Check className="w-5 h-5 text-stone-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-stone-700">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="pt-8 border-t border-stone-100">
                 <h2 className="text-2xl font-serif font-bold mb-6">
-                  Inclusiones del nivel {selectedPackage?.service_levels?.name}
+                  Adicionales del nivel {selectedPackage?.service_levels?.name}
                 </h2>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {selectedPackage?.features?.map((item, index) => (
-                    <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-stone-50 border border-stone-100">
-                      <Check className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-stone-700">{item}</span>
-                    </div>
-                  ))}
+                  {packageInclusions.length > 0 ? (
+                    packageInclusions.map((item, index) => (
+                      <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-orange-50/50 border border-orange-100">
+                        <Check className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-stone-800">{item}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-stone-500 italic">No hay especificaciones extra para este paquete.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -160,7 +191,7 @@ export default function ExperienceDetailPage() {
                       <span className="text-3xl font-black text-orange-700">
                         {formatPrice(totalPrice)}
                       </span>
-                      <span className="text-xs text-stone-400 font-bold uppercase tracking-widest">Subtotal</span>
+                      <span className="text-xs text-stone-400 font-bold uppercase tracking-widest">IVA incluido</span>
                     </div>
 
                     <div className="space-y-6">
@@ -189,7 +220,7 @@ export default function ExperienceDetailPage() {
                             }`}
                           >
                             <span className="font-bold text-sm text-stone-800">{pkg.service_levels?.name}</span>
-                            <span className="text-xs font-black text-orange-600">{formatPrice(Number(pkg.price))}</span>
+                            <span className="text-xs font-black text-orange-600">{formatPrice(Number(pkg.price))}<br/><span className="font-normal text-stone-500 text-[10px]">IVA incluido</span></span>
                           </div>
                         ))}
                       </div>

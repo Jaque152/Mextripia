@@ -15,8 +15,8 @@ export function Footer() {
                 <img src="/logo 2.png" alt="Logo zenith mexico" className="w-full h-full object-contain" />
               </div>
               <div>
-                <span className="text-xl font-serif font-semibold text-background">ZenithMexico</span>
-                <span className="text-xl font-serif font-light text-primary">.com.mx</span>
+                <span className="text-xl font-serif font-semibold text-background">zenithmex</span>
+                <span className="text-xl font-serif font-light text-primary">.com</span>
               </div>
             </div>
             <p className="text-background/60 mb-6 max-w-md">
@@ -70,8 +70,8 @@ export function Footer() {
             <h4 className="font-serif font-semibold text-lg mb-6">Contacto</h4>
             <ul className="space-y-3 text-background/60">
               <li>
-                <a href="mailto:informes@zenithmexico.com.mx" className="hover:text-primary transition-colors">
-                  informes@zenithmexico.com.mx
+                <a href="mailto:informes@zenithmex.com" className="hover:text-primary transition-colors">
+                  informes@zenithmex.com
                 </a>
               </li>
               <li>
@@ -87,7 +87,7 @@ export function Footer() {
         <div className="border-t border-background/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-background/40">
-              © {new Date().getFullYear()} zenithmexico.com.mx- Todos los derechos reservados
+              © {new Date().getFullYear()} zenithmex.com- Todos los derechos reservados
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
               <Link href="/aviso-de-privacidad" className="text-background/60 hover:text-primary transition-colors">

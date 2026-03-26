@@ -23,7 +23,7 @@ const sections = [
   },
   {
     heading: "6. Contacto",
-    content: "Para ejercer sus derechos o realizar consultas sobre el tratamiento de sus datos personales, puede comunicarse con nosotros a través del correo electrónico informes@zenithmexico.com.mx o al teléfono +52 55 5555 5555."
+    content: "Para ejercer sus derechos o realizar consultas sobre el tratamiento de sus datos personales, puede comunicarse con nosotros a través del correo electrónico informes@zenithmex.com o al teléfono +52 55 5555 5555."
   }
 ];
 

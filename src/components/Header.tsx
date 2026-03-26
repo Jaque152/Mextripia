@@ -16,7 +16,7 @@ import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { href: "/", label: "Inicio" },
-  { href: "/#experiencias", label: "Experiencias" },
+  { href: "/experiencias", label: "Experiencias" }, 
   { href: "/#contacto", label: "Contacto" },
 ];
 
@@ -43,7 +43,7 @@ export function Header() {
             <div className="w-14 h-14 flex items-center justify-center p-1 transition-transform duration-300 group-hover:scale-110">
               <img 
                 src="/logo 2.png"
-                alt="Logo zenithmexico.com.mx"
+                alt="Logo zenithmex.com"
                 className="w-full h-full object-contain" 
               />
             </div>
@@ -92,16 +92,16 @@ export function Header() {
               onMouseEnter={() => setShowMiniCart(true)}
               onMouseLeave={() => setShowMiniCart(false)}
             >
-              <Link href="/carrito">
-                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" asChild>
+                <Link href="/carrito">
                   <ShoppingCart className="w-5 h-5" />
                   {itemCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-medium">
                       {itemCount}
                     </span>
                   )}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
 
               {showMiniCart && (
                 <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50">
@@ -113,18 +113,25 @@ export function Header() {
                   ) : (
                     <>
                       <div className="max-h-64 overflow-y-auto">
-                        {cart.items.slice(0, 3).map((item) => (
-                          <div key={`${item.packageId}-${item.date}`} className="p-3 border-b border-border/50">
-                            <div className="flex gap-3">
-                              <img src={item.experience.image_url} className="w-12 h-12 rounded object-cover" alt="" />
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-xs font-medium truncate">{item.experience.title}</h4>
-                                <p className="text-[10px] text-muted-foreground">{item.people}p • {item.levelName}</p>
-                                <p className="text-xs font-semibold text-primary">{formatPrice(item.totalPrice)}</p>
+                        {cart.items.slice(0, 3).map((item) => {
+                          // Extrae la primera imagen del arreglo JSONB
+                          const miniImage = item.experience.images && item.experience.images.length > 0 
+                                              ? item.experience.images[0] 
+                                              : '/placeholder.jpg';
+
+                          return (
+                            <div key={`${item.packageId}-${item.date}`} className="p-3 border-b border-border/50">
+                              <div className="flex gap-3">
+                                <img src={miniImage} className="w-12 h-12 rounded object-cover" alt={item.experience.title} />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-xs font-medium truncate">{item.experience.title}</h4>
+                                  <p className="text-[10px] text-muted-foreground">{item.people}p • {item.levelName}</p>
+                                  <p className="text-xs font-semibold text-primary">{formatPrice(item.totalPrice)}</p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                       <div className="p-4 bg-secondary/30">
                         <Link href="/carrito" className="block w-full py-2 bg-primary text-primary-foreground text-center rounded-lg text-sm font-medium">Ver Carrito</Link>

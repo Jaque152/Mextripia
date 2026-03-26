@@ -20,7 +20,7 @@
 - [x] Types y Data - Tipos TypeScript y datos mock
 
 ## Credenciales Admin Demo
-- Email: admin@zenithmexico.com.mx
+- Email: zenithmex.com
 - Password: admin123
 
 ## Rutas del Proyecto

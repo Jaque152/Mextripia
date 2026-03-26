@@ -71,8 +71,8 @@ export function Contact() {
                   </div>
                   <div>
                     <h4 className="font-medium mb-1">Correo Electrónico</h4>
-                    <a href="mailto:informes@zenithmexico.com.mx" className="text-muted-foreground hover:text-primary transition-colors">
-                      informes@zenithmexico.com.mx
+                    <a href="mailto:informes@zenithmex.com" className="text-muted-foreground hover:text-primary transition-colors">
+                      informes@zenithmex.com
                     </a>
                   </div>
                 </CardContent>

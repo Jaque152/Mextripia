@@ -27,12 +27,10 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="rounded-full px-8 group bg-primary">
-                <Link href="#experiencias">
-                  Ver Experiencias
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
+            <Button asChild className="mt-4">
+              <Link href="/experiencias">Ver experiencias
+              </Link>
+            </Button>
             </div>
           </div>
 
@@ -40,7 +38,7 @@ export function Hero() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
                 <div className="aspect-[3/4] rounded-3xl overflow-hidden relative group shadow-2xl">
-                  <div className="absolute inset-0 bg-[url('https://img.static-kl.com/transform/265eff4b-a104-4da9-83f0-3c998b03b1fe/')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-[url('https://lugares.inah.gob.mx/sites/default/files/zonas/185_A_slider_chichen_itza_3.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 flex items-center gap-2 text-white">
                     <MapPin className="w-4 h-4" />

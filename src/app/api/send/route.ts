@@ -6,6 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // IMPORTANTE: En modo prueba (sin dominio comprado),
 // Resend solo deja enviar aL correo de registro.
 const DEMO_RECIPIENT_EMAIL = 'jaknet.software.dev@gmail.com';
+
 interface EmailItem {
   experience_title: string;
   travel_date: string;
@@ -13,10 +14,10 @@ interface EmailItem {
   package_name: string;
   subtotal: string;
 }
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    // DetectaR si es una compra o una cotización
     const { type, customerName, email, resCode, items, total } = body; 
 
     let subject = "";
@@ -28,13 +29,12 @@ export async function POST(req: Request) {
 
     // --- DISEÑO 1: CORREO DE CONFIRMACIÓN DE COMPRA ---
     if (type === 'PURCHASE') {
-      const { resCode, items, total, travelDate } = body;
       subject = `Confirmación de Compra: ${resCode} - ¡Gracias por viajar con nosotros!`;
 
       htmlContent = `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; color: #444; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
           <div style="background-color: ${primaryColor}; padding: 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 24px; letter-spacing: 1px;">DTOUR VIAJES</h1>
+            <h1 style="color: white; margin: 0; font-size: 24px; letter-spacing: 1px;">Zineth México</h1>
           </div>
 
           <div style="padding: 40px 30px;">
@@ -88,12 +88,8 @@ export async function POST(req: Request) {
           </div>
 
           <div style="background-color: #f5f5f4; padding: 30px; text-align: center; font-size: 12px; color: #a8a29e;">
-            <p style="margin: 0 0 10px;">Este es un recibo oficial de tu compra en Dtour Viajes.</p>
-            <p style="margin: 0;">¿Tienes dudas? Contáctanos a soporte@viajesdtour.mx</p>
-            <div style="margin-top: 20px;">
-              <a href="#" style="color: ${primaryColor}; text-decoration: none; margin: 0 10px;">Términos</a>
-              <a href="#" style="color: ${primaryColor}; text-decoration: none; margin: 0 10px;">Privacidad</a>
-            </div>
+            <p style="margin: 0 0 10px;">Este es un recibo oficial de tu compra en Zenith México.</p>
+            <p style="margin: 0;">¿Tienes dudas? Contáctanos a soporte@zenithmex.com</p>
           </div>
         </div>
       `;
@@ -102,26 +98,29 @@ export async function POST(req: Request) {
 
     // --- DISEÑO 2: CORREO DE CONFIRMACIÓN DE COTIZACIÓN ---
     else if (type === 'QUOTE') {
-      const { email, destination, travelers, message, date } = body;
-      subject = `[Solicitud Recibida] Gracias por tu mensaje - Viajes.mx`;
+      
+      const { destination, budget, startDate, endDate, travelers, message } = body; 
+      
+      subject = `[Solicitud Recibida] Gracias por tu mensaje - Zenith México`;
 
       htmlContent = `
         <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto;">
           <div style="background: linear-gradient(135deg, #10b981 0%, ${primaryColor} 100%); padding: 15px; text-align: center; border-radius: 10px 10px 0 0; color: #fff; font-weight: bold;">
-            Zenith
+            Zenith México
           </div>
           <div style="padding: 30px; border: 1px solid #eee; border-top: 0; border-radius: 0 0 10px 10px;">
             <h2 style="margin:0 0 15px;">Recibimos tu solicitud de cotización</h2>
             <p>Hola, <strong>${customerName}</strong>,</p>
-            <p style="color: #666; margin-bottom: 25px;">Gracias por confiar en nosotros para planear tu próximo viaje. Un asesor experto se pondrá en contacto contigo en menos de 24 horas.</p>
-            
+            <p style="color: #666; margin-bottom: 25px;">Gracias por confiar en nosotros para planear tu viaje a <strong>${destination}</strong>. Un asesor experto se pondrá en contacto contigo en menos de 24 horas.</p>
+
+                        
             <div style="background: #fdf2f2; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #fee2e2;">
               <p style="margin: 0; color: ${primaryColor}; font-weight: bold;">TU MENSAJE</p>
               <p style="margin: 10px 0 0; font-size: 14px; font-style: italic; color: #555;">${message}</p>
             </div>
             
             <p style="color: #666; margin-bottom: 25px;">Mientras tanto, puedes seguir explorando nuestras experiencias.</p>
-            <a href="https://zenithmexico.com.mx/#experiencias" style="display: block; width: 100%; text-align: center; background: ${primaryColor}; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold;">Ver más experiencias</a>
+            <a href="https://zenithmex.com/#experiencias" style="display: block; width: 100%; text-align: center; background: ${primaryColor}; color: #fff; padding: 15px; border-radius: 30px; text-decoration: none; font-weight: bold;">Ver más experiencias</a>
           </div>
         </div>
       `;
@@ -129,8 +128,8 @@ export async function POST(req: Request) {
 
     // --- ENVÍO REAL VÍA NODEMAILER (A Resend SMTP) ---
     const { data, error } = await resend.emails.send({
-      from: 'zenithmexico.com.mx <confirmaciones@resend.dev>', // Email por defecto de Resend
-      to: [DEMO_RECIPIENT_EMAIL], 
+      from: 'zenithmex.com <confirmaciones@resend.dev>', // Email por defecto de Resend
+      to: [DEMO_RECIPIENT_EMAIL], // Se envía a correo de pruebas
       subject: subject,
       html: htmlContent,
     });
