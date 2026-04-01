@@ -333,7 +333,7 @@ INSERT INTO public.activity_packages (activity_id, level_id, price, features) VA
 -- =========================================
 -- 1. CABO SAN LUCAS: CUATRIMOTOS
 UPDATE public.activities SET 
-  images = '["https://media.tacdn.com/media/attractions-splice-spp-674x446/12/6d/be/63.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1553966012-dd33086ea262?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía turístico bilingüe", "Equipo de seguridad (casco, gafas y paliacate)", "Agua purificada", "Capacitación e introducción al manejo"]'::jsonb,
   requirements = '["Calzado cerrado y cómodo", "Protector solar", "Ropa cómoda que se pueda ensuciar"]'::jsonb,
   restrictions = '["Mujeres embarazadas"]'::jsonb
@@ -341,7 +341,7 @@ WHERE slug = 'cabo-cuatrimoto-tequila';
 
 -- 2. CANCÚN: MANATÍES
 UPDATE public.activities SET 
-  images = '["https://eplat.com/content/themes/base/images/cancun/activities/p105/a28113/Manati07.jpg?width=920&height=520&mode=crop&autorotate=true"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1578404421628-5d0b4c8662de?q=80&w=1183&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Encuentro con manatíes con instructor especializado", "Acceso a taquillas, duchas, tumbonas y piscina"]'::jsonb,
   requirements = '["Bañador", "Protector solar biodegradable"]'::jsonb,
   restrictions = '["Menores de 8 años", "Embarazadas y personas con problemas de movilidad", "Prohibido el uso de cámaras o celulares durante el encuentro"]'::jsonb
@@ -349,7 +349,7 @@ WHERE slug = 'manaties-isla-mujeres';
 
 -- 3. CDMX: LUCHA LIBRE
 UPDATE public.activities SET 
-  images = '["https://www.radiomas.mx/wp-content/uploads/sites/6/2021/05/magia-blanca-regresado-brios-lucha_0_20_912_568.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1524633412778-878453ef0cd7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Anfitrión bilingüe especializado", "Taller de diseño y elaboración", "Regalo vintage sorpresa"]'::jsonb,
   requirements = '[]'::jsonb,
   restrictions = '["Personas con problemas de movilidad"]'::jsonb
@@ -357,7 +357,7 @@ WHERE slug = 'lucha-libre-cdmx';
 
 -- 4. CDMX: TEQUILA Y MEZCAL
 UPDATE public.activities SET 
-  images = '["https://www.dondeir.com/wp-content/uploads/2025/09/15-de-septiembre.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1674916084024-50cdd3f6b864?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Entrada al Museo del Tequila y Mezcal (MUTEM)", "Acceso a exposiciones permanentes"]'::jsonb,
   requirements = '["Identificación oficial"]'::jsonb,
   restrictions = '["Menores de 18 años", "Personas en silla de ruedas"]'::jsonb
@@ -365,7 +365,7 @@ WHERE slug = 'museo-tequila-mezcal-cdmx';
 
 -- 5. CDMX: MURALES DIEGO RIVERA
 UPDATE public.activities SET 
-  images = '["https://offloadmedia.feverup.com/cdmxsecreta.com/wp-content/uploads/2025/01/31143233/mural-Sueno-de-una-tarde-dominical-en-la-Alameda-Central.jpg"]'::jsonb,
+  images = '["https://plus.unsplash.com/premium_photo-1677611303654-c29103848c0d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía experto en historia y arte"]'::jsonb,
   requirements = '["Calzado cómodo para caminar", "Pasaporte o identificación oficial"]'::jsonb,
   restrictions = '[]'::jsonb
@@ -373,7 +373,7 @@ WHERE slug = 'murales-diego-rivera-cdmx';
 
 -- 6. CUEVAS DE TOLANTONGO
 UPDATE public.activities SET 
-  images = '["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/93/a5/31/caption.jpg?w=1200&h=-1&s=1"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1730985764421-3b7e512534bb?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Alquiler de taquilla"]'::jsonb,
   requirements = '["Gafas de sol", "Bañador", "Muda de ropa", "Toalla", "Calzado acuático", "Dinero en efectivo", "Pasaporte o copia"]'::jsonb,
   restrictions = '["Personas en silla de ruedas"]'::jsonb
@@ -381,7 +381,7 @@ WHERE slug = 'cuevas-tolantongo';
 
 -- 7. DESDE CABO: TIBURÓN BALLENA
 UPDATE public.activities SET 
-  images = '["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe3xq1vGg4Zf77BQnbFArD0sqNlQJxAIdDxw&s"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1544552866-49ce864ff896?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Transporte redondo", "Desayuno ligero", "Guía certificado", "Equipo de snorkel, chaleco y traje de neopreno", "Tiempo libre en La Paz"]'::jsonb,
   requirements = '["Traje de baño", "Toalla", "Cámara", "Chamarra ligera"]'::jsonb,
   restrictions = '["Menores de 8 años", "Mujeres embarazadas", "Personas con problemas de espalda o cuello", "Personas con movilidad reducida o silla de ruedas"]'::jsonb
@@ -389,7 +389,7 @@ WHERE slug = 'tiburon-ballena-desde-cabo';
 
 -- 8. EL ROSARIO: MARIPOSA MONARCA
 UPDATE public.activities SET 
-  images = '["https://offloadmedia.feverup.com/cdmxsecreta.com/wp-content/uploads/2022/01/24105143/R-1024x683.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1525468552045-b18dbaa5a45f?q=80&w=1229&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Entrada al santuario El Rosario", "Tickets de peaje y aparcamiento"]'::jsonb,
   requirements = '["Calzado cómodo y de senderismo", "Ropa abrigada", "Protector solar", "Agua", "Prismáticos y cámara"]'::jsonb,
   restrictions = '["Embarazadas", "Personas con problemas de movilidad o espalda", "Problemas cardíacos o respiratorios", "Personas sensibles al mal de altura (está a más de 3,000 msnm)"]'::jsonb
@@ -397,7 +397,7 @@ WHERE slug = 'mariposa-monarca-rosario';
 
 -- 9. EXCURSIÓN AMEALCO, TEQUISQUIAPAN, BERNAL
 UPDATE public.activities SET 
-  images = '["https://descubreenmexico.com/wp-content/uploads/2022/03/amealco.webp"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1584316273822-7c8d337f6e44?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía turístico profesional", "Taller de elaboración de muñecos Lele", "Acompañamiento en recorrido"]'::jsonb,
   requirements = '["Ropa y calzado cómodo"]'::jsonb,
   restrictions = '[]'::jsonb
@@ -413,7 +413,7 @@ WHERE slug = 'safari-oceanico-la-paz';
 
 -- 11. LA PAZ: NADO TIBURÓN BALLENA BIÓLOGO
 UPDATE public.activities SET 
-  images = '["https://cdn1.yumping.com.mx/emp/fotos/301/P/040314/640/p-40314-impresionante-nado-con-tiburones-ballena_15833444454321.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1576647025587-2b77cd953cba?q=80&w=1143&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Equipo completo de snorkel y traje de neopreno", "Guía bilingüe biólogo marino", "Fotografías de identificación científica"]'::jsonb,
   requirements = '["Traje de baño", "Protector solar biodegradable", "Botella de agua reutilizable"]'::jsonb,
   restrictions = '["Bebés menores de 1 año", "Mujeres embarazadas", "Personas con movilidad reducida"]'::jsonb
@@ -421,7 +421,7 @@ WHERE slug = 'nado-tiburon-ballena-biologo';
 
 -- 12. LA PAZ: SAFARI DELFINES Y ORCAS
 UPDATE public.activities SET 
-  images = '["https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=390,height=260/tour_img/4584ecff49371464d9f32531117d8a3eb49dbf62ce4aada574e435ab4ffa5038.jpeg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1608516978217-3714c0aa340e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Safari oceánico guiado de exploración", "Guía bilingüe especializado"]'::jsonb,
   requirements = '["Ropa cómoda y de abrigo ligero", "Gafas de sol y sombrero", "Protector solar biodegradable", "Medicación para el mareo"]'::jsonb,
   restrictions = '["Mujeres embarazadas", "Personas con problemas severos de movilidad", "Personas con alta sensibilidad al mareo"]'::jsonb
@@ -429,7 +429,7 @@ WHERE slug = 'safari-delfines-orcas-paz';
 
 -- 13. LOS CABOS: AVISTAMIENTO DE BALLENAS
 UPDATE public.activities SET 
-  images = '["https://www.toursloscabos.com/wp-content/uploads/2016/02/Whale-Watching-San-Lucas.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1568430462989-44163eb1752f?q=80&w=1173&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Embarcación con área sombreada y sanitario marino", "Guía bilingüe", "Agua embotellada y chaleco salvavidas"]'::jsonb,
   requirements = '["Protector solar biodegradable", "Chamarra o sudadera ligera", "Medicación contra el mareo"]'::jsonb,
   restrictions = '["Niños menores de 4 años", "Mujeres embarazadas", "Personas con afecciones de espalda"]'::jsonb
@@ -437,7 +437,7 @@ WHERE slug = 'avistamiento-ballenas-cabos';
 
 -- 14. LOS CABOS: CRUCERO PIRATA
 UPDATE public.activities SET 
-  images = '["https://media-cdn.tripadvisor.com/media/attractions-splice-spp-674x446/0b/c2/b6/c6.jpg"]'::jsonb,
+  images = '["https://plus.unsplash.com/premium_photo-1756175546805-e3498cbb07b8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Espectáculo interactivo en vivo a bordo", "Cena barbacoa estilo pirata", "Barra libre ilimitada"]'::jsonb,
   requirements = '["Tarjeta de crédito o efectivo para gastos adicionales y propinas"]'::jsonb,
   restrictions = '[]'::jsonb
@@ -445,7 +445,7 @@ WHERE slug = 'crucero-pirata-cabos';
 
 -- 15. LOS CABOS: LANCHA TRANSPARENTE
 UPDATE public.activities SET 
-  images = '["https://auika.com/wp-content/uploads/2022/07/lancha-transparente-4.jpeg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1679310290383-a5ed4c3145a3?q=80&w=1035&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Paseo por la bahía en lancha de cristal", "Visita guiada al Arco"]'::jsonb,
   requirements = '["Toalla", "Ropa de playa", "Traje de baño"]'::jsonb,
   restrictions = '["Personas recién operadas", "Personas con fuerte mareo por movimiento", "Mayores de 95 años", "Prohibido zapatos de tacón"]'::jsonb
@@ -453,7 +453,7 @@ WHERE slug = 'arco-lancha-transparente';
 
 -- 16. MARTINICA: DELFINES Y ARRECIFES
 UPDATE public.activities SET 
-  images = '["https://storage.googleapis.com/medicina-responsable.appspot.com/1653297245809.jpg?GoogleAccessId=firebase-adminsdk-2sbvv%40medicina-responsable.iam.gserviceaccount.com&Expires=2524604400&Signature=WmDm9nHt%2BkabvtcDvwnD7gf6DQkwVa4PY9QUzeEcwJ%2Fwjwu7OtZQ%2B%2F8V5ZMnvAJd9oasT8GEHZGwRhU2%2FVfLqFDzDhKiNSc49Y%2BElB6GQ57ekOyruHxe7%2Ba23dJyhyDveQ4uTGjzoJEO%2FCDw6Wlc5w5NgGXssv3vG4HeaP%2FNO3FD2jhXczr%2FmnsHoYWdUu2o6MTHAGpcor%2F3JInFB3LobWcqVFLtJII%2Bw7HoyDelT2reAawfaOey2dKlmAog2SFaodGKIM%2B%2BR0ztR1Pmtd6VIsC6YWig8yEeF6VE2T%2BgvPKOE1rLrxKm0aU%2B9kYKA9VpN1xFkGJC60KETc2TWwLmzw%3D%3D"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1637308106043-f4d78ad9e0e0?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía bilingüe", "Aperitivos y refrescos locales"]'::jsonb,
   requirements = '["Protector solar", "Gafas de sol y sombrero", "Calzado cómodo para el barco", "Traje de baño"]'::jsonb,
   restrictions = '["Personas con movilidad reducida (según accesibilidad del barco)"]'::jsonb
@@ -461,7 +461,7 @@ WHERE slug = 'delfines-arrecife-martinica';
 
 -- 17. MORELIA: TOUR CENTRO HISTÓRICO
 UPDATE public.activities SET 
-  images = '["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtxe9vxoMeLYfhIIYrkOm8QBgm2Nmi1zHsQ&s"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1700960566497-cbc1d5e396a0?q=80&w=1051&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Tour a pie con guía local experto"]'::jsonb,
   requirements = '["Calzado cómodo (hay superficies irregulares)"]'::jsonb,
   restrictions = '[]'::jsonb
@@ -469,7 +469,7 @@ WHERE slug = 'tour-morelia-centro';
 
 -- 18. NEVADO DE TOLUCA
 UPDATE public.activities SET 
-  images = '["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/4b/62/4d/photo4jpg.jpg?w=1200&h=1200&s=1"]'::jsonb,
+  images = '["https://plus.unsplash.com/premium_photo-1701151540950-1f4bab0ef5d9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía profesional", "Tasas de montaña", "Material técnico", "Seguro"]'::jsonb,
   requirements = '["Calzado de senderismo", "Ropa de lluvia y abrigo", "Guantes y gafas de sol", "Muda de ropa y toalla"]'::jsonb,
   restrictions = '["Embarazadas", "Personas con problemas de espalda o movilidad", "Problemas respiratorios, epilepsia o hemofilia"]'::jsonb
@@ -477,7 +477,7 @@ WHERE slug = 'nevado-toluca-cima';
 
 -- 19. PÁTZCUARO - JANITZIO
 UPDATE public.activities SET 
-  images = '["https://media-cdn.tripadvisor.com/media/photo-s/1c/11/e5/5d/patzcuaro-y-janitzio.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1583594122640-87580dec8952?q=80&w=1035&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía/conductor bilingüe", "Paseo en barco por la isla", "Entradas y admisiones"]'::jsonb,
   requirements = '["Calzado cómodo", "Gorra", "Cámara", "Dinero en efectivo"]'::jsonb,
   restrictions = '["Menores de 10 años", "Personas en silla de ruedas", "Personas con peso superior a 100 kg", "Personas con hipertensión"]'::jsonb
@@ -485,7 +485,7 @@ WHERE slug = 'patzcuaro-janitzio-redes';
 
 -- 20. PUERTO VALLARTA: LIBERACIÓN TORTUGAS
 UPDATE public.activities SET 
-  images = '["https://livingandtravel.com.mx/wp-content/uploads/2023/07/arton26280.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1645720135736-9ae19651b729?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía especializado", "Experiencia de liberación", "Agua"]'::jsonb,
   requirements = '["Protector solar biodegradable", "Ropa cómoda", "Repelente de insectos"]'::jsonb,
   restrictions = '["Menores de 5 años (solo observan)", "Personas con problemas de movilidad", "Problemas respiratorios o hipertensión", "Baja condición física"]'::jsonb
@@ -501,7 +501,7 @@ WHERE slug = 'bernal-freixenet-queretaro';
 
 -- 22. QUERÉTARO: TRANVÍA CLÁSICO
 UPDATE public.activities SET 
-  images = '["https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=center,quality=60,width=450,height=450,dpr=2/tour_img/4b24fd4aa45b6308aa7dbe552e09a2610b362ea96273c6dd0e6dd88bd3559b52.jpg"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1604187698587-cfdc58cee2ea?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Tour guiado en tranvía clásico", "Guía en español"]'::jsonb,
   requirements = '["Llegar 10 minutos antes de la salida"]'::jsonb,
   restrictions = '[]'::jsonb
@@ -509,7 +509,7 @@ WHERE slug = 'tranvia-clasico-queretaro';
 
 -- 23. RIVIERA MAYA: AQUA NICK
 UPDATE public.activities SET 
-  images = '["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/18/71/c2/es-hora-de-experimentar.jpg?w=900&h=500&s=1"]'::jsonb,
+  images = '["https://images.unsplash.com/photo-1565358720137-55235e0878a2?q=80&w=1115&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Acceso ilimitado a atracciones, ríos y piscinas", "Toallas y tumbonas"]'::jsonb,
   requirements = '["Pasaporte o ID oficial", "Traje de baño y cambio de ropa", "Sandalias o calzado acuático", "Protector solar biodegradable"]'::jsonb,
   restrictions = '["Embarazadas", "Problemas de espalda o cardíacos", "Silla de ruedas (para atracciones)"]'::jsonb
@@ -517,7 +517,7 @@ WHERE slug = 'aqua-nick-riviera-maya';
 
 -- 24. ROATÁN: SANTUARIO MONO Y PEREZOSO
 UPDATE public.activities SET
-  images = '["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8NzXBGrK8J_LAMZm6LN1StsGqL99kywssXw&s"]'::jsonb,
+  images = '["https://plus.unsplash.com/premium_photo-1661877112841-0efa68b18527?q=80&w=1088&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Guía bilingüe", "Entrada a los santuarios", "Acceso a Club de playa con sillas, duchas y WiFi"]'::jsonb,
   requirements = '["Protector solar", "Repelente de insectos"]'::jsonb,
   restrictions = '["Personas con problemas de movilidad"]'::jsonb
@@ -525,7 +525,7 @@ WHERE slug = 'santuario-mono-perezoso';
 
 -- 25. SAYULITA: PASEO A CABALLO
 UPDATE public.activities SET 
-  images = '["https://media.tacdn.com/media/attractions-splice-spp-674x446/11/0d/de/1c.jpg"]'::jsonb,
+  images = '["https://plus.unsplash.com/premium_photo-1692895424068-9bfcb99f8d48?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Agua embotellada", "Todo el equipo necesario para montar", "Acceso a piscina del rancho"]'::jsonb,
   requirements = '["Calzado cerrado o de senderismo (prohibidas chanclas)", "Ropa transpirable", "Repelente y protector solar"]'::jsonb,
   restrictions = '["Bebés menores de 1 año y mayores de 70 años", "Embarazadas", "Personas en silla de ruedas o problemas de espalda", "Peso máximo 150 kg"]'::jsonb
@@ -533,7 +533,7 @@ WHERE slug = 'paseo-caballo-sayulita';
 
 -- 26. VALLADOLID: ABEJAS MAYAS XKOPEK
 UPDATE public.activities SET 
-  images = '["https://www.nationalgeographic.com.es/medio/2020/11/18/abeja-en-un-panal_144b397e.jpg"]'::jsonb,
+  images = '["https://plus.unsplash.com/premium_photo-1661859445943-0d14d6faf230?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'::jsonb,
   included_general = '["Entrada al parque apícola Xkopek", "Guía bilingüe especializado", "Degustación de miel y agua fresca"]'::jsonb,
   requirements = '["Ropa cómoda", "Calzado cerrado para zonas pedregosas", "Únicamente repelente orgánico"]'::jsonb,
   restrictions = '["Menores de 5 años"]'::jsonb

@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from '@/lib/supabase';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
-import { CheckCircle, Loader2, User, FileText, ChevronLeft, Lock } from "lucide-react";
+import { CheckCircle, Loader2, User, FileText, Lock, CreditCard } from "lucide-react";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -22,14 +21,13 @@ export default function CheckoutPage() {
   const [contactInfo, setContactInfo] = useState({ firstName: "", lastName: "", email: "", phone: "" });
   const [needsInvoice, setNeedsInvoice] = useState(false);
   
-  // Estado completo para coincidir con los campos de la BD
   const [billingInfo, setBillingInfo] = useState({ 
-    rfc: "", 
-    razon_social: "", 
-    direccion_facturacion: "",
-    ciudad_facturacion: "",
-    estado_facturacion: "",
-    codigo_postal_facturacion: ""
+    rfc: "", razon_social: "", direccion_facturacion: "", 
+    ciudad_facturacion: "", estado_facturacion: "", codigo_postal_facturacion: ""
+  });
+
+  const [cardInfo, setCardInfo] = useState({
+    number: "", name: "", expiry: "", cvv: ""
   });
 
   const formatPrice = (price: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(price);
@@ -39,85 +37,48 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // 1. Insertar o recuperar Cliente Invitado
-      const { data: customer, error: custError } = await supabase
-        .from('customers')
-        .upsert({ first_name: contactInfo.firstName, last_name: contactInfo.lastName, email: contactInfo.email, phone: contactInfo.phone }, { onConflict: 'email' })
-        .select().single();
-
-      if (custError) throw custError;
-
-      // Generar un ID de transacción simulado único
-      const simulatedTxnId = `SIM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
-
-      // 2. Crear la Reserva con TODOS los campos de facturación conectados
-      const { data: booking, error: bookError } = await supabase
-        .from('bookings')
-        .insert({
-          customer_id: customer.id,
-          total_amount: cart.total,
-          payment_status: 'paid',
-          transaction_id: simulatedTxnId, 
-          payment_provider: 'simulated_checkout', 
-          payment_date: new Date().toISOString(), 
-          
-          // Datos de facturación conectados al estado
-          rfc: needsInvoice ? billingInfo.rfc : null,
-          razon_social: needsInvoice ? billingInfo.razon_social : null,
-          direccion_facturacion: needsInvoice ? billingInfo.direccion_facturacion : null,
-          ciudad_facturacion: needsInvoice ? billingInfo.ciudad_facturacion : null,
-          estado_facturacion: needsInvoice ? billingInfo.estado_facturacion : null,
-          codigo_postal_facturacion: needsInvoice ? billingInfo.codigo_postal_facturacion : null
-        })
-        .select().single();
-
-      if (bookError) throw bookError;
-
-      // 3. Insertar los Items del carrito en la reserva
-      for (const item of cart.items) {
-        await supabase.from('booking_items').insert({
-          booking_id: booking.id,
-          package_id: item.packageId,
-          scheduled_date: item.date,
-          pax_qty: item.people,
-          unit_price: item.pricePerPerson
-        });
-      }
-
-      const visualCode = `RES-${booking.id.slice(0, 8).toUpperCase()}`;
-      setConfirmationCode(visualCode);
-      
-      // 4. Llamada al API de correo
-      await fetch('/api/send', {
+      // 1. Enviar TODO a nuestro propio backend seguro (/api/checkout)
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'PURCHASE',
-          email: contactInfo.email,
-          customerName: contactInfo.firstName,
-          resCode: visualCode,
-          items: cart.items.map(i => ({
-            experience_title: i.experience.title,
-            travel_date: i.date,
-            pax_qty: i.people,
-            package_name: i.levelName,
-            subtotal: formatPrice(i.totalPrice)
-          })),
-          total: formatPrice(cart.total)
-        }),
+          contactInfo,
+          billingInfo,
+          needsInvoice,
+          cart,
+          cardInfo,
+          formattedTotal: formatPrice(cart.total) // Le pasamos el total formateado al back
+        })
       });
 
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Error procesando el pago");
+      }
+
+      // 2. Si todo salió bien, mostramos el éxito
+      setConfirmationCode(data.visualCode);
       setShowSuccess(true);
       clearCart();
-    } catch (error) {
+      
+    } catch (error: any) {
       console.error(error);
-      alert("Error al procesar reserva. Por favor intenta de nuevo.");
+      alert(`Error al procesar el pago: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const isFormValid = contactInfo.firstName && contactInfo.email && contactInfo.phone;
+  const isFormValid = contactInfo.firstName && contactInfo.email && contactInfo.phone &&
+    cardInfo.number.length >= 15 && cardInfo.name && cardInfo.expiry.length === 5 && cardInfo.cvv.length >= 3;
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 4) val = val.slice(0, 4);
+    if (val.length > 2) val = `${val.slice(0, 2)}/${val.slice(2)}`;
+    setCardInfo({ ...cardInfo, expiry: val });
+  };
 
   if (showSuccess) {
     return (
@@ -126,9 +87,10 @@ export default function CheckoutPage() {
         <main className="flex-1 pt-32 flex items-center justify-center px-4">
           <Card className="max-w-lg w-full text-center p-10 shadow-2xl">
             <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
-            <h1 className="text-3xl font-serif font-bold mb-3">¡Reservación Confirmada!</h1>
-            <p className="mb-8">Código: <span className="font-mono font-bold">{confirmationCode}</span></p>
-            <Button asChild className="w-full bg-orange-400 rounded-full"><Link href="/">Volver al Inicio</Link></Button>
+            <h1 className="text-3xl font-serif font-bold mb-3">¡Pago Exitoso!</h1>
+            <p className="text-stone-600 mb-2">Tu reservación ha sido confirmada.</p>
+            <p className="mb-8">Código: <span className="font-mono font-bold text-lg">{confirmationCode}</span></p>
+            <Button asChild className="w-full bg-orange-400 hover:bg-orange-500 rounded-full h-12 text-lg"><Link href="/">Volver al Inicio</Link></Button>
           </Card>
         </main>
         <Footer />
@@ -143,45 +105,93 @@ export default function CheckoutPage() {
         <div className="container mx-auto px-4 py-12">
           <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
-              <Card className="p-6">
-                <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2"><User className="text-orange-600"/> Contacto</h2>
+              
+              <Card className="p-6 border-stone-200 shadow-sm">
+                <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2 text-stone-800">
+                  <User className="text-orange-600 w-5 h-5"/> Datos de Contacto
+                </h2>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <Input value={contactInfo.firstName} onChange={(e)=>setContactInfo({...contactInfo, firstName:e.target.value})} placeholder="Nombre *" required />
-                  <Input value={contactInfo.lastName} onChange={(e)=>setContactInfo({...contactInfo, lastName:e.target.value})} placeholder="Apellidos" />
-                  <Input type="email" value={contactInfo.email} onChange={(e)=>setContactInfo({...contactInfo, email:e.target.value})} placeholder="Email *" required />
-                  <Input type="tel" value={contactInfo.phone} onChange={(e)=>setContactInfo({...contactInfo, phone:e.target.value})} placeholder="Teléfono *" required />
+                  <Input value={contactInfo.firstName} onChange={(e)=>setContactInfo({...contactInfo, firstName:e.target.value})} placeholder="Nombre *" required className="bg-white" />
+                  <Input value={contactInfo.lastName} onChange={(e)=>setContactInfo({...contactInfo, lastName:e.target.value})} placeholder="Apellidos" className="bg-white" />
+                  <Input type="email" value={contactInfo.email} onChange={(e)=>setContactInfo({...contactInfo, email:e.target.value})} placeholder="Email *" required className="bg-white" />
+                  <Input type="tel" value={contactInfo.phone} onChange={(e)=>setContactInfo({...contactInfo, phone:e.target.value})} placeholder="Teléfono *" required className="bg-white" />
                 </div>
               </Card>
               
-              <Card className="p-6">
-                <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2"><FileText className="text-orange-600"/> Facturación</h2>
-                <label className="flex items-center gap-2 mb-4 cursor-pointer">
-                  <input type="checkbox" checked={needsInvoice} onChange={(e)=>setNeedsInvoice(e.target.checked)} /> 
+              <Card className="p-6 border-stone-200 shadow-sm">
+                <h2 className="text-xl font-serif font-semibold mb-6 flex items-center gap-2 text-stone-800">
+                  <FileText className="text-orange-600 w-5 h-5"/> Facturación
+                </h2>
+                <label className="flex items-center gap-2 mb-4 cursor-pointer text-stone-600">
+                  <input type="checkbox" checked={needsInvoice} onChange={(e)=>setNeedsInvoice(e.target.checked)} className="rounded text-orange-600 focus:ring-orange-500" /> 
                   Requiero factura
                 </label>
                 
-                {/* Inputs de Facturación restaurados y conectados */}
                 {needsInvoice && (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input placeholder="RFC *" required={needsInvoice} value={billingInfo.rfc} onChange={(e)=>setBillingInfo({...billingInfo, rfc:e.target.value})} />
-                    <Input placeholder="Razón Social *" required={needsInvoice} value={billingInfo.razon_social} onChange={(e)=>setBillingInfo({...billingInfo, razon_social:e.target.value})} />
-                    <Input className="sm:col-span-2" placeholder="Dirección Completa (Calle y número) *" required={needsInvoice} value={billingInfo.direccion_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, direccion_facturacion:e.target.value})} />
-                    <Input placeholder="Ciudad *" required={needsInvoice} value={billingInfo.ciudad_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, ciudad_facturacion:e.target.value})} />
-                    <Input placeholder="Estado *" required={needsInvoice} value={billingInfo.estado_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, estado_facturacion:e.target.value})} />
-                    <Input placeholder="Código Postal *" required={needsInvoice} value={billingInfo.codigo_postal_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, codigo_postal_facturacion:e.target.value})} />
+                  <div className="grid sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                    <Input placeholder="RFC *" required={needsInvoice} value={billingInfo.rfc} onChange={(e)=>setBillingInfo({...billingInfo, rfc:e.target.value})} className="bg-white" />
+                    <Input placeholder="Razón Social *" required={needsInvoice} value={billingInfo.razon_social} onChange={(e)=>setBillingInfo({...billingInfo, razon_social:e.target.value})} className="bg-white" />
+                    <Input className="sm:col-span-2 bg-white" placeholder="Dirección Completa (Calle y número) *" required={needsInvoice} value={billingInfo.direccion_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, direccion_facturacion:e.target.value})} />
+                    <Input placeholder="Ciudad *" required={needsInvoice} value={billingInfo.ciudad_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, ciudad_facturacion:e.target.value})} className="bg-white" />
+                    <Input placeholder="Estado *" required={needsInvoice} value={billingInfo.estado_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, estado_facturacion:e.target.value})} className="bg-white" />
+                    <Input placeholder="Código Postal *" required={needsInvoice} value={billingInfo.codigo_postal_facturacion} onChange={(e)=>setBillingInfo({...billingInfo, codigo_postal_facturacion:e.target.value})} className="bg-white" />
                   </div>
                 )}
               </Card>
+
+              <Card className="p-6 border-stone-200 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                  <CreditCard className="w-32 h-32" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-serif font-semibold flex items-center gap-2 text-stone-800">
+                      <CreditCard className="text-orange-600 w-5 h-5"/> Método de Pago
+                    </h2>
+                    <div className="flex items-center gap-1 text-xs font-bold text-stone-400 bg-stone-100 px-2 py-1 rounded-md">
+                      <Lock className="w-3 h-3" /> PAGO SEGURO
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-4 max-w-md">
+                    <Input placeholder="Número de Tarjeta *" required maxLength={19} value={cardInfo.number} onChange={(e)=>setCardInfo({...cardInfo, number: e.target.value.replace(/\D/g, '')})} className="bg-white font-mono text-lg tracking-widest" />
+                    <Input placeholder="Nombre en la tarjeta *" required value={cardInfo.name} onChange={(e)=>setCardInfo({...cardInfo, name: e.target.value.toUpperCase()})} className="bg-white" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input placeholder="MM/AA *" required maxLength={5} value={cardInfo.expiry} onChange={handleExpiryChange} className="bg-white text-center" />
+                      <Input placeholder="CVV *" type="password" required maxLength={4} value={cardInfo.cvv} onChange={(e)=>setCardInfo({...cardInfo, cvv: e.target.value.replace(/\D/g, '')})} className="bg-white text-center tracking-widest" />
+                    </div>
+                    <p className="text-[10px] text-stone-400 text-center mt-2">Tus datos están protegidos y encriptados de extremo a extremo.</p>
+                  </div>
+                </div>
+              </Card>
+
             </div>
             
             <div className="lg:col-span-1">
-              <Card className="p-6 sticky top-28">
-                <h2 className="text-xl font-serif font-semibold mb-6">Resumen</h2>
-                <div className="border-t pt-4 mt-4">
-                  <div className="flex justify-between text-xl font-bold text-orange-700"><span>Total</span><span>{formatPrice(cart.total)}</span></div>
-                  <Button type="submit" disabled={!isFormValid || isProcessing} className="w-full mt-6 bg-orange-400 h-12 rounded-full shadow-lg gap-2">
-                    {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : <Lock className="w-4 h-4" />}
-                    {isProcessing ? "Procesando pago..." : "Simular y Confirmar Pago"}
+              <Card className="p-6 sticky top-28 border-stone-200 shadow-xl">
+                <h2 className="text-xl font-serif font-semibold mb-6 text-stone-800">Resumen de Compra</h2>
+                
+                <div className="space-y-3 mb-6">
+                  {cart.items.map((item, index) => (
+                    <div key={index} className="flex justify-between text-sm">
+                      <span className="text-stone-600 truncate pr-4">{item.experience.title} (x{item.people})</span>
+                      <span className="font-medium text-stone-900">{formatPrice(item.totalPrice)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-stone-100 pt-4 mt-4">
+                  <div className="flex justify-between items-end text-xl font-bold text-orange-700 mb-6">
+                    <span>Total a Pagar</span>
+                    <div className="text-right">
+                      <div>{formatPrice(cart.total)}</div>
+                      <div className="text-xs font-normal text-stone-500">IVA incluido</div>
+                    </div>
+                  </div>
+                  
+                  <Button type="submit" disabled={!isFormValid || isProcessing} className="w-full bg-orange-600 hover:bg-orange-700 text-white h-14 rounded-full shadow-lg shadow-orange-200 gap-2 text-lg transition-all">
+                    {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : <Lock className="w-5 h-5" />}
+                    {isProcessing ? "Procesando pago..." : `Pagar ${formatPrice(cart.total)}`}
                   </Button>
                 </div>
               </Card>

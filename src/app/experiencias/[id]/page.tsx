@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { Experience, ActivityPackage } from "@/lib/types"; 
 import {
-  MapPin, Check, Minus, Plus, ShoppingCart, Loader2
+  MapPin, Check, Minus, Plus, ShoppingCart, Loader2, Clock, AlertTriangle, Info, ListChecks
 } from "lucide-react";
 
 export default function ExperienceDetailPage() {
@@ -50,11 +50,11 @@ export default function ExperienceDetailPage() {
           setExperience({
             id: activity.id,
             title: activity.title,
-            slug: activity.slug, // Añadido
+            slug: activity.slug,
             description: activity.description,
             location: activity.location,
-            duration: activity.duration, // Añadido
-            images: activity.images || [], // Reemplaza image_url
+            duration: activity.duration, 
+            images: activity.images || [], 
             itinerary: activity.itinerary,
             requirements: activity.requirements,
             restrictions: activity.restrictions,
@@ -118,10 +118,7 @@ export default function ExperienceDetailPage() {
 
   if (!experience) return null;
 
-  // Extraer imagen principal de forma segura
   const mainImage = experience.images?.length > 0 ? experience.images[0] : '/placeholder.jpg';
-  
-  // Extraer las inclusiones específicas del paquete (ahora vienen del JSON features.incluye)
   const packageInclusions = selectedPackage?.features?.incluye || [];
 
   return (
@@ -131,28 +128,91 @@ export default function ExperienceDetailPage() {
         <div className="container mx-auto px-4 lg:px-8 py-8 lg:py-12">
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-10">
+              {/* Imagen Principal */}
               <div className="aspect-[16/9] rounded-3xl overflow-hidden shadow-xl bg-stone-100">
                 <img src={mainImage} alt={experience.title} className="w-full h-full object-cover" />
               </div>
 
+              {/* Título y Descripción */}
               <div>
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                   <Badge variant="secondary" className="bg-orange-50 text-orange-700">
                     {experience.categories?.name || "Aventura"}
                   </Badge>
                   <span className="flex items-center gap-1 text-sm text-stone-500 font-medium">
-                    <MapPin className="w-4 h-4" /> {experience.location}
+                    <MapPin className="w-4 h-4 text-orange-500" /> {experience.location}
                   </span>
+                  {experience.duration && (
+                    <span className="flex items-center gap-1 text-sm text-stone-500 font-medium ml-2">
+                      <Clock className="w-4 h-4 text-orange-500" /> {experience.duration}
+                    </span>
+                  )}
                 </div>
                 <h1 className="text-4xl font-serif font-bold mb-4 text-stone-900">{experience.title}</h1>
                 <p className="text-lg text-stone-600 leading-relaxed">{experience.description}</p>
               </div>
 
-              {/* OPCIONAL: Mostrar lo que incluye en GENERAL (de la tabla activities) */}
+              {/* Itinerario (Si existe) */}
+              {experience.itinerary && experience.itinerary.length > 0 && (
+                <div className="pt-8 border-t border-stone-100">
+                  <h2 className="text-2xl font-serif font-bold mb-6 flex items-center gap-2">
+                    <ListChecks className="text-orange-600" /> Itinerario
+                  </h2>
+                  <ol className="relative border-l border-stone-200 ml-3 space-y-6">
+                    {experience.itinerary.map((step, index) => (
+                      <li key={index} className="ml-6">
+                        <span className="absolute flex items-center justify-center w-6 h-6 bg-orange-100 rounded-full -left-3 ring-8 ring-white">
+                          <span className="text-xs font-bold text-orange-800">{index + 1}</span>
+                        </span>
+                        <h3 className="font-medium text-stone-800 pt-0.5">{step}</h3>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {/* Requerimientos y Restricciones */}
+              <div className="grid md:grid-cols-2 gap-8 pt-8 border-t border-stone-100">
+                {/* Requerimientos */}
+                {experience.requirements && experience.requirements.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-serif font-bold mb-4 flex items-center gap-2 text-stone-800">
+                      <Info className="w-5 h-5 text-blue-500" /> Qué llevar / Requisitos
+                    </h3>
+                    <ul className="space-y-2">
+                      {experience.requirements.map((req, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-stone-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                          {req}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Restricciones */}
+                {experience.restrictions && experience.restrictions.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-serif font-bold mb-4 flex items-center gap-2 text-stone-800">
+                      <AlertTriangle className="w-5 h-5 text-red-500" /> Restricciones
+                    </h3>
+                    <ul className="space-y-2">
+                      {experience.restrictions.map((res, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-stone-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+                          {res}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Inclusiones Generales */}
               {experience.included_general && experience.included_general.length > 0 && (
                 <div className="pt-8 border-t border-stone-100">
-                  <h2 className="text-2xl font-serif font-bold mb-6">Lo que incluye esta experiencia</h2>
+                  <h2 className="text-2xl font-serif font-bold mb-6">Lo que incluye en general</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     {experience.included_general.map((item, index) => (
                       <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-stone-50 border border-stone-100">
@@ -164,80 +224,93 @@ export default function ExperienceDetailPage() {
                 </div>
               )}
 
+              {/* Inclusiones del Paquete Específico */}
               <div className="pt-8 border-t border-stone-100">
                 <h2 className="text-2xl font-serif font-bold mb-6">
-                  Adicionales del nivel {selectedPackage?.service_levels?.name}
+                  Adicionales del nivel <span className="text-orange-600">{selectedPackage?.service_levels?.name}</span>
                 </h2>
                 <div className="grid md:grid-cols-2 gap-4">
                   {packageInclusions.length > 0 ? (
                     packageInclusions.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-orange-50/50 border border-orange-100">
+                      <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-orange-50/50 border border-orange-100 transition-all">
                         <Check className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-stone-800">{item}</span>
+                        <span className="text-sm text-stone-800 font-medium">{item}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-stone-500 italic">No hay especificaciones extra para este paquete.</p>
+                    <p className="text-sm text-stone-500 italic bg-stone-50 p-4 rounded-xl border border-stone-100">
+                      Este nivel base te da acceso al tour general. Selecciona un nivel superior para ver más beneficios.
+                    </p>
                   )}
                 </div>
               </div>
             </div>
 
+            {/* TARJETA DE RESERVA */}
             <div className="lg:col-span-1">
               <div className="sticky top-28">
                 <Card className="border-none shadow-2xl bg-stone-50/50 rounded-3xl overflow-hidden">
                   <CardContent className="p-8">
-                    <div className="flex items-baseline gap-1 mb-6">
-                      <span className="text-3xl font-black text-orange-700">
+                    <div className="flex items-baseline gap-1 mb-6 flex-wrap">
+                      <span className="text-4xl font-black text-orange-700">
                         {formatPrice(totalPrice)}
                       </span>
-                      <span className="text-xs text-stone-400 font-bold uppercase tracking-widest">IVA incluido</span>
+                      <span className="text-xs text-stone-400 font-bold uppercase tracking-widest ml-1">IVA incluido</span>
                     </div>
 
                     <div className="space-y-6">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-stone-500 tracking-widest">Fecha</label>
-                        <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} min={minDateStr} className="rounded-xl h-12 bg-white" />
+                        <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} min={minDateStr} className="rounded-xl h-12 bg-white font-medium" />
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase text-stone-500 tracking-widest">Personas</label>
-                        <div className="flex items-center justify-between bg-white p-1 rounded-xl border h-12">
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-lg" onClick={() => setPeople(Math.max(1, people - 1))}><Minus className="w-4 h-4"/></Button>
+                        <div className="flex items-center justify-between bg-white p-1 rounded-xl border h-12 shadow-sm">
+                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-lg hover:bg-stone-100" onClick={() => setPeople(Math.max(1, people - 1))}><Minus className="w-4 h-4"/></Button>
                           <span className="font-bold text-lg">{people}</span>
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-lg" onClick={() => setPeople(people + 1)}><Plus className="w-4 h-4"/></Button>
+                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-lg hover:bg-stone-100" onClick={() => setPeople(people + 1)}><Plus className="w-4 h-4"/></Button>
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase text-stone-500 tracking-widest">Nivel de Paquete</label>
+                        <label className="text-[10px] font-black uppercase text-stone-500 tracking-widest flex items-center justify-between">
+                          Nivel de Paquete
+                          <span className="text-orange-500 font-normal capitalize">Selecciona uno</span>
+                        </label>
                         {packages.map((pkg) => (
                           <div 
                             key={pkg.id}
                             onClick={() => setSelectedPackage(pkg)}
-                            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex justify-between items-center ${
-                              selectedPackage?.id === pkg.id ? "border-orange-600 bg-white shadow-sm" : "border-stone-100 bg-white/50 hover:border-orange-200"
+                            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex justify-between items-center group ${
+                              selectedPackage?.id === pkg.id 
+                                ? "border-orange-500 bg-white shadow-md ring-2 ring-orange-500/20" 
+                                : "border-stone-200 bg-white/60 hover:border-orange-300"
                             }`}
                           >
                             <span className="font-bold text-sm text-stone-800">{pkg.service_levels?.name}</span>
-                            <span className="text-xs font-black text-orange-600">{formatPrice(Number(pkg.price))}<br/><span className="font-normal text-stone-500 text-[10px]">IVA incluido</span></span>
+                            <span className="text-right">
+                              <span className="text-xs font-black text-orange-600 block">{formatPrice(Number(pkg.price))}</span>
+                              <span className="font-normal text-stone-400 text-[9px] uppercase tracking-wider block">x persona</span>
+                            </span>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     <Button 
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-full h-14 mt-8 shadow-lg shadow-orange-100 gap-2 font-bold text-lg"
+                      className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-full h-14 mt-8 shadow-xl shadow-orange-600/20 gap-2 font-bold text-lg transition-all active:scale-[0.98]"
                       onClick={handleAddToCart}
                       disabled={!selectedDate || isAdding}
                     >
-                      {isAdding ? <Loader2 className="animate-spin" /> : <ShoppingCart className="w-5 h-5" />} 
-                      {isAdding ? "Agregando..." : "Reservar Ahora"}
+                      {isAdding ? <Loader2 className="animate-spin w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />} 
+                      {isAdding ? "Procesando..." : "Agregar al carrito"}
                     </Button>
                   </CardContent>
                 </Card>
               </div>
             </div>
+            
           </div>
         </div>
       </main>
