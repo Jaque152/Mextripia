@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const primaryColor = '#c2410c'; 
     
     const isEnglish = locale === 'en';
-    const subject = isEnglish
+    const subjectClient = isEnglish
       ? `[Request Received] Thank you for your message - Zenith México`
       : `[Solicitud Recibida] Gracias por tu mensaje - Zenith México`;
 
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const ctaText = isEnglish ? `See more experiences` : `Ver más experiencias`;
     const ctaLink = isEnglish ? `https://zenithmex.com/en/#experiencias` : `https://zenithmex.com/es/#experiencias`;
 
-    const htmlContent = `
+    const htmlClient = `
       <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto;">
         <div style="background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%); padding: 20px; text-align: center; border-radius: 10px 10px 0 0; color: #fff; font-weight: bold;">
           Zenith México
@@ -66,9 +66,39 @@ export async function POST(req: Request) {
     const { data, error } = await resend.emails.send({
       from: 'Zenith México <cotizaciones@zenithmex.com>',
       to: [email], 
-      bcc: ['contacto@zenithmex.com'], 
-      subject: subject,
-      html: htmlContent,
+      //bcc: ['contacto@zenithmex.com'], 
+      subject: subjectClient,
+      html: htmlClient,
+    });
+
+
+    // --- NOTIFICACIÓN INTERNA PARA ZENITH ---
+    const subjectInternal = `[NUEVA COTIZACIÓN] - ${destination} - ${customerName}`;
+
+    const htmlInternal = `
+      <div style="font-family: sans-serif; color: #333;">
+        <h2 style="color: #c2410c;">Nueva Solicitud de Viaje</h2>
+        <p>Un cliente ha solicitado un itinerario personalizado.</p>
+        <hr/>
+        <p><strong>Cliente:</strong> ${customerName}</p>
+        <p><strong>Destino:</strong> ${destination}</p>
+        <p><strong>Fechas:</strong> ${startDate} a ${endDate}</p>
+        <p><strong>Viajeros:</strong> ${travelers}</p>
+        <p><strong>Presupuesto:</strong> ${budget}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <hr/>
+        <p><strong>Mensaje del cliente:</strong></p>
+        <p style="background: #f4f4f4; padding: 15px; border-radius: 5px;">${message}</p>
+        <hr/>
+        <p><em>Tip: Responde a este cliente antes de 24 horas para aumentar la probabilidad de cierre.</em></p>
+      </div>
+    `;
+
+    await resend.emails.send({
+      from: 'Sistema Zenith México <cotizaciones@zenithmex.com>',
+      to: ['contacto@zenithmex.com'],
+      subject: subjectInternal,
+      html: htmlInternal,
     });
 
     if (error) {

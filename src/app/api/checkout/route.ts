@@ -168,7 +168,7 @@ export async function POST(req: Request) {
     const primaryColor = '#c2410c';
 
     const isEnglish = locale === 'en';
-    const subjectEmail = isEnglish 
+    const subjectClient = isEnglish 
       ? `Purchase Confirmation: ${visualCode} - Thank you for traveling with us!` 
       : `Confirmación de Compra: ${visualCode} - ¡Gracias por viajar con nosotros!`;
 
@@ -186,7 +186,7 @@ export async function POST(req: Request) {
     const addressLabel = isEnglish ? "Address:" : "Dirección:";
     const notesLabel = isEnglish ? "Notes:" : "Notas:";
     
-    const htmlContent = `
+    const htmlClient = `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; color: #444; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
           <div style="background-color: ${primaryColor}; padding: 30px; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 24px; letter-spacing: 1px;">Zenith México</h1>
@@ -251,10 +251,47 @@ export async function POST(req: Request) {
     await resend.emails.send({
       from: 'Zenith México <reservas@zenithmex.com>', 
       to: [contactInfo.email], 
-      bcc: ['contacto@zenithmex.com'],
-      subject: subjectEmail,
-      html: htmlContent,
+      //bcc: ['contacto@zenithmex.com'],
+      subject: subjectClient,
+      html: htmlClient,
     });
+
+
+    // --- NOTIFICACIÓN INTERNA PARA ZENITH ---
+    const subjectInternal = `[NUEVA VENTA] - ${formattedTotal} - ${contactInfo.firstName} ${contactInfo.lastName}`;
+    
+    const htmlInternal = `
+      <div style="font-family: sans-serif; color: #333;">
+        <h2 style="color: #c2410c;">¡Nueva Venta Registrada!</h2>
+        <p>Se ha procesado un pago exitoso a través de la página web.</p>
+        <hr/>
+        <p><strong>Monto Total:</strong> ${formattedTotal}</p>
+        <p><strong>Folio Interno:</strong> ${visualCode}</p>
+        <p><strong>ID Transacción (Etomin):</strong> ${saleData.transactionId || saleData.authorizationNumber}</p>
+        <hr/>
+        <h3>Datos del Cliente:</h3>
+        <p><strong>Nombre:</strong> ${contactInfo.firstName} ${contactInfo.lastName}</p>
+        <p><strong>Email:</strong> ${contactInfo.email}</p>
+        <p><strong>Teléfono:</strong> ${contactInfo.phone}</p>
+        <p><strong>Dirección:</strong> ${billingInfo.direccion}, ${billingInfo.localidad}, ${billingInfo.estado}, ${billingInfo.codigo_postal}</p>
+        <p><strong>Notas:</strong> ${orderNotes || 'Sin notas'}</p>
+        <hr/>
+        <h3>Detalle del Pedido:</h3>
+        <ul>
+          ${!manualFolioData ? cart.items.map((item: any) => `
+            <li>${item.experience.title} (x${item.people}) - ${formatPrice(item.totalPrice)}</li>
+          `).join('') : `<li>Pago Manual de Folio: ${manualFolioData.folio}</li>`}
+        </ul>
+      </div>
+    `;
+
+    await resend.emails.send({
+      from: 'Sistema Zenith México <reservas@zenithmex.com>',
+      to: ['contacto@zenithmex.com'],
+      subject: subjectInternal,
+      html: htmlInternal,
+    });
+
 
     return NextResponse.json({ 
       success: true, 
