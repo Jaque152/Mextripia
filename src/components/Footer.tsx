@@ -143,26 +143,6 @@ export function Footer() {
               <Link href={`/${locale}/politica-de-cancelacion`} className="text-background/60 hover:text-primary transition-colors">
                 <T>Política de Cancelación</T>
               </Link>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-between gap-3 bg-white text-foreground px-3 py-1.5 rounded-md border border-border min-w-[130px] outline-none">
-                  <span className="flex items-center gap-2">
-                    <span className="text-base leading-none">{locale === 'en' ? '🇺🇸' : '🇲🇽'}</span>
-                    <span className="font-medium text-sm">{locale === 'en' ? 'English' : 'Español'}</span>
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[130px] bg-white rounded-md shadow-sm border border-border">
-                  <DropdownMenuItem onClick={() => handleLanguageChange('en')} className="cursor-pointer flex items-center gap-2 px-3 py-2 hover:bg-stone-50">
-                    <span className="text-base leading-none">🇺🇸</span>
-                    <span className={`text-sm ${locale === 'en' ? "font-semibold text-primary" : "text-foreground"}`}>English</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('es')} className="cursor-pointer flex items-center gap-2 px-3 py-2 hover:bg-stone-50">
-                    <span className="text-base leading-none">🇲🇽</span>
-                    <span className={`text-sm ${locale === 'es' ? "font-semibold text-primary" : "text-foreground"}`}>Español</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
         </div>
