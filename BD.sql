@@ -286,7 +286,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Sabor Maya” y Clase de Cocina en Playa del Carmen', 
   'sabor-maya-clase-cocina', 2, '50 Avenida Nte., Ejidal, Playa del Carmen', 'Aproximadamente 3 horas', 
   'Sumérgete en la auténtica cocina mexicana con esta clase práctica en Playa del Carmen. Guiado por la chef Alma, aprenderás a preparar platillos tradicionales como tortillas hechas a mano, salsas frescas y guacamole, utilizando ingredientes locales frescos.',
-  '["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2070"]'::jsonb, -- Preparing Mexican ingredients
+  '["https://images.pexels.com/photos/8477297/pexels-photo-8477297.jpeg"]'::jsonb, -- Preparing Mexican ingredients
   '["Clase de cocina impartida por chef profesional.", "Visita al mercado local para seleccionar ingredientes frescos.", "Preparación de tortillas, salsas y guacamole.", "Almuerzo con los platillos preparados.", "Recetas familiares para llevar a casa."]'::jsonb,
   '{"Horario de inicio": ["10:00 a.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -294,7 +294,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Sabores Locales” en Cancún', 
   'sabores-locales-cancun', 1, 'Recogida en tu alojamiento en Cancún.', 'Aproximadamente 4 horas y 30 minutos', 
   'Embárcate en un recorrido de medio día por el corazón de Cancún, explorando mercados locales, puestos de comida callejera y callejones llenos de arte urbano. Este tour te permitirá degustar una variedad de especialidades locales, como barbacoa y tacos.',
-  '["https://images.unsplash.com/photo-1512132411229-c30391241dd8?q=80&w=2070"]'::jsonb, -- Authentic night taco stall in Cancun
+  '["https://images.pexels.com/photos/12319830/pexels-photo-12319830.jpeg"]'::jsonb, -- Authentic night taco stall in Cancun
   '["Guía local experto en gastronomía y cultura.", "Degustaciones en varios puestos de comida y mercados locales.", "Visita a murales y arte urbano en callejones ocultos.", "Información sobre la historia y tradiciones culinarias de Cancún."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preference del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -302,7 +302,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Paraíso Privado” Club de Playa de Lujo en Costa Maya', 
   'paraiso-privado-club-playa-costa-maya', 3, 'Puerto de cruceros de Costa Maya.', 'Aproximadamente 4 horas y 30 minutos', 
   'Escapa de las multitudes y disfruta de una experiencia exclusiva en la Costa Maya. Este tour ofrece acceso a un club de playa privado donde podrás relajarte en tu propio deck con baño y ducha privados, mientras disfrutas de un servicio personalizado de alimentos y bebidas.',
-  '["https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070"]'::jsonb, -- Overwater hammocks at a luxury beach club
+  '["https://images.pexels.com/photos/21856213/pexels-photo-21856213.jpeg"]'::jsonb, -- Overwater hammocks at a luxury beach club
   '["Acceso a un deck privado con baño y ducha.", "Servicio personalizado de alimentos y bebidas.", "Actividades acuáticas: snorkel, kayak y paddleboard.", "Actividades terrestres: juegos de mesa, fútbol y voleibol."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según la llegada del crucero."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -310,7 +310,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Navegando Sabores" y Tour Privado en Yate a Isla Mujeres', 
   'yate-privado-isla-mujeres', 3, 'Recogida en tu alojamiento en Cancún.', 'Aproximadamente 4 horas', 
   'Embárcate en una experiencia exclusiva a bordo de un yate privado de 42 pies, navegando por las aguas cristalinas del Caribe mexicano. Este tour personalizado incluye un recorrido por la laguna Nichupté, una parada para snorkel en Isla Mujeres y una deliciosa comida a bordo.',
-  '["https://images.unsplash.com/photo-1569263991206-8b2b95b452ac?q=80&w=2070"]'::jsonb, -- Private yacht anchored in turquoise Caribbean water
+  '["https://images.pexels.com/photos/15304502/pexels-photo-15304502.jpeg"]'::jsonb, -- Private yacht anchored in turquoise Caribbean water
   '["Recorrido en yate privado de 42 pies.", "Parada para snorkel en Isla Mujeres.", "Comida a bordo (ceviche fresco)."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preference del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -318,7 +318,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Ritmos del Mar" y Crucero al Atardecer con Cena y Show Nocturno', 
   'ritmos-del-mar-crucero-vallarta', 3, 'Terminal Marítima de Puerto Vallarta', 'Aproximadamente 5 horas', 
   'Embárcate en una experiencia única en Puerto Vallarta con un elegante crucero al atardecer por la Bahía de Banderas. Disfruta de una cena buffet a la luz de las velas en la playa privada de Las Caletas, acompañada de música en vivo y un espectáculo nocturno.',
-  '["https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?q=80&w=2070"]'::jsonb, -- Candlelit dinner setup on a secluded beach at night under lights
+  '["https://images.pexels.com/photos/11762658/pexels-photo-11762658.jpeg"]'::jsonb, -- Candlelit dinner setup on a secluded beach at night under lights
   '["Crucero al atardecer en catamarán desde Puerto Vallarta.", "Cena buffet internacional a la luz de las velas en la playa.", "Espectáculo nocturno \"Ritmos del Mar\" con música, danza y acrobacias.", "Barra libre nacional (bebidas alcohólicas y no alcohólicas)."]'::jsonb,
   '{"Horario de inicio": ["17:00 h (hora local)."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 );

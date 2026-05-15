@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { ShoppingBag, Menu, X, ArrowRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { T } from "@/components/T";
+import { CartItem } from "@/lib/types";
 
 export function Header() {
   const locale = useLocale();
@@ -68,7 +69,7 @@ export function Header() {
                 <div className="p-6 max-h-[300px] overflow-y-auto">
                   {cart?.items?.length > 0 ? (
                     <div className="space-y-4">
-                      {cart.items.map((item: any, idx: number) => (
+                      {cart.items.map((item: CartItem, idx: number) => (
                         <div key={idx} className="flex gap-4 border-b border-border/50 pb-4 last:border-0 last:pb-0">
                           <img src={item.experience.images[0] || '/placeholder.jpg'} alt={item.experience.title} className="w-12 h-12 object-cover rounded-lg" />
                           <div className="flex-1">
