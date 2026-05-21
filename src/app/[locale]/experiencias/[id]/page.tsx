@@ -31,8 +31,8 @@ export default function ExperienceDetailPage() {
         .eq('id', params.id as string)
         .single();
 
-      if (data) {
-        if (data.packages) data.packages.sort((a: any, b: any) => a.min_pax - b.min_pax);
+      if (data) {        
+        if (data.packages) data.packages.sort((a: ActivityPackage, b: ActivityPackage) => a.min_pax - b.min_pax);
         setExperience(data);
       }
       setLoading(false);
