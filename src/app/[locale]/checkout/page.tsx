@@ -125,7 +125,7 @@ function CheckoutContent() {
             
             {/* Panel Contacto */}
             <section>
-              <h2 className="text-2xl font-serif mb-8 border-b border-border pb-2 text-foreground"><T>Datos del Huésped</T></h2>
+              <h2 className="text-2xl font-serif mb-8 border-b border-border pb-2 text-foreground"><T>Datos de Facturación</T></h2>
               <div className="grid sm:grid-cols-2 gap-8">
                 <div>
                   <label className={labelClass}>{phNombre}</label>

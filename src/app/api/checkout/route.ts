@@ -126,7 +126,7 @@ export async function POST(req: Request) {
 
     // 5. GUARDAR EN SUPABASE
     const { data: customer, error: custError } = await supabase
-      .from('customers_Mextripia')
+      .from('customers_mextripia')
       .upsert({ 
         first_name: contactInfo.firstName, 
         last_name: contactInfo.lastName, 
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
     if (custError) throw new Error("Error guardando cliente en la base de datos.");
 
     const { data: booking, error: bookError } = await supabase
-      .from('bookings_Mextripia')
+      .from('bookings_mextripia')
       .insert({
         customer_id: customer.id,
         session_id: manualFolioData ? manualFolioData.folio : null,
@@ -169,7 +169,7 @@ export async function POST(req: Request) {
           unit_price: item.pricePerPerson
         }));
       if (validBookingItems.length > 0) {
-        const { error: itemsError } = await supabase.from('booking_items_Mextripia').insert(validBookingItems);
+        const { error: itemsError } = await supabase.from('booking_items_mextripia').insert(validBookingItems);
         if (itemsError) throw new Error("Error guardando items de reserva en la BD.");
       }   
     }
@@ -277,7 +277,7 @@ export async function POST(req: Request) {
         <p><strong>Monto Total:</strong> ${formattedTotal}</p>
         <p><strong>ID Transacción (Keycop):</strong> ${saleData.transactionId || saleData.authorizationNumber}</p>
         <hr/>
-        <h3>Datos del Huésped:</h3>
+        <h3>Datos de Facturación:</h3>
         <p><strong>Nombre:</strong> ${contactInfo.firstName} ${contactInfo.lastName}</p>
         <p><strong>Email:</strong> ${contactInfo.email}</p>
         <p><strong>Teléfono:</strong> ${contactInfo.phone}</p>

@@ -1,9 +1,14 @@
 "use client";
-
+import { useLocale } from 'next-intl';
+import Link from 'next/link';
 import { T } from "@/components/T";
 import Image from 'next/image';
+import { Trophy } from "lucide-react";
+
+
 
 export function FifaSection() {
+  const locale = useLocale();
   return (
     <section className="py-24 md:py-32 relative">
       <div className="container mx-auto px-6 max-w-7xl relative">
@@ -29,9 +34,14 @@ export function FifaSection() {
           <p className="text-muted-foreground leading-relaxed mb-8">
             <T>Garantice su presencia en los recintos gastronómicos más exclusivos durante la justa deportiva. Nos encargamos de sus accesos, reservas privadas y un ambiente inmejorable para que su única preocupación sea celebrar.</T>
           </p>
-          <button className="bg-foreground text-white px-10 py-4 rounded-full text-xs font-bold tracking-[0.2em] uppercase hover:bg-primary transition-colors duration-300">
-            <T>Asegurar Espacio</T>
-          </button>
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <Link 
+              href={`/${locale}/mundial-2026`} 
+              className="bg-foreground text-background px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-primary transition-all duration-500"
+            >
+              <T>Explorar Hospitalidad VIP</T>
+            </Link>
+          </div>
         </div>
 
       </div>

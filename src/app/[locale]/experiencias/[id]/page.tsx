@@ -6,11 +6,10 @@ import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { supabase } from '@/lib/supabase';
-import { Loader2, Calendar as CalendarIcon, MapPin, Clock, Utensils, CheckCircle2 } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon, MapPin, Clock, Utensils, CheckCircle2, ChevronRight } from "lucide-react";
 import { T } from "@/components/T";
 import { useCart } from "@/context/CartContext";
-import { ActivityPackage } from "@/lib/types";
-import { Experience } from "@/lib/types";
+import { ActivityPackage, Experience } from "@/lib/types";
 
 export default function ExperienceDetailPage() {
   const params = useParams();
@@ -20,8 +19,6 @@ export default function ExperienceDetailPage() {
   
   const [experience, setExperience] = useState<Experience | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  // Estados para reserva
   const [selectedDate, setSelectedDate] = useState("");
   const [pax, setPax] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState<ActivityPackage | null>(null);
@@ -30,22 +27,12 @@ export default function ExperienceDetailPage() {
     async function fetchDetail() {
       const { data, error } = await supabase
         .from('activities_mextripia')
-        .select(`
-          *,
-          categories:categories_mextripia(name, slug),
-          packages:activity_packages_mextripia(*)
-        `)
+        .select(`*, categories:categories_mextripia(name, slug), packages:activity_packages_mextripia(*)`)
         .eq('id', params.id as string)
         .single();
 
-      if (error) {
-        console.error("Error de Supabase (Detalle):", JSON.stringify(error));
-      }
-
       if (data) {
-        if (data.packages) {
-          data.packages.sort((a: ActivityPackage, b: ActivityPackage) => a.min_pax - b.min_pax);
-        }
+        if (data.packages) data.packages.sort((a: any, b: any) => a.min_pax - b.min_pax);
         setExperience(data);
       }
       setLoading(false);
@@ -53,23 +40,14 @@ export default function ExperienceDetailPage() {
     fetchDetail();
   }, [params.id]);
 
-  // LÓGICA CORE INTACTA
   useEffect(() => {
-    if (experience?.packages && experience.packages.length > 0) {
-      const matchedPackage = experience.packages.find((pkg: ActivityPackage) => {
-        const max = pkg.max_pax || 999;
-        return pax >= pkg.min_pax && pax <= max;
-      });
-
-      if (matchedPackage) {
-        setSelectedPackage(matchedPackage);
-      } else {
-        setSelectedPackage(experience.packages[experience.packages.length - 1]);
-      }
+    if (experience?.packages?.length) {
+      const matched = experience.packages.find((pkg) => pax >= pkg.min_pax && pax <= (pkg.max_pax || 999));
+      setSelectedPackage(matched || experience.packages[experience.packages.length - 1]);
     }
   }, [pax, experience]);
 
-const handleAddToCart = () => {
+  const handleAddToCart = () => {
     // Le agregamos !experience a esta validación
     if (!selectedDate || !selectedPackage || !experience) return; 
     
@@ -87,161 +65,140 @@ const handleAddToCart = () => {
     router.push(`/${locale}/carrito`);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-12 h-12 animate-spin text-primary" strokeWidth={3} /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
   if (!experience) return <div className="min-h-screen flex items-center justify-center bg-background"><T>Experiencia no encontrada</T></div>;
-
-  const mainImage = experience.images?.[0] || '/placeholder.jpg';
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      <main className="flex-1 pt-32 pb-24 relative">
+      <main className="flex-1 pt-40 pb-24">
         <div className="container mx-auto px-6 max-w-7xl">
           
-          <div className="mb-8 animate-bounce-up">
-            <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-black font-bricolage text-foreground leading-tight mb-4 tracking-tight">
-              <T>{experience.title}</T>
-            </h1>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+          <div className="flex flex-col lg:flex-row gap-16">
             
-            {/* Columna Izquierda: Info de la Experiencia */}
-            <div className="w-full lg:w-7/12 animate-bounce-up delay-100">
-              
-              <div className="relative aspect-[4/3] w-full rounded-[3rem] overflow-hidden mb-10 shadow-2xl shadow-primary/10 border-4 border-white">
-                <Image src={mainImage} alt={experience.title} fill className="object-cover" priority />
+            {/* Contenido (Izquierda) */}
+            <div className="w-full lg:w-7/12 animate-fade-in-up">
+              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">
+                {experience.location}
+              </span>
+              <h1 className="text-5xl md:text-6xl font-serif text-foreground leading-tight mb-10">
+                {experience.title}
+              </h1>
+
+              <div className="relative aspect-video w-full rounded-[var(--radius)] overflow-hidden mb-12 shadow-xl">
+                <Image src={experience.images?.[0] || '/placeholder.jpg'} alt={experience.title} fill className="object-cover" priority />
               </div>
 
-              <div className="prose prose-lg max-w-none text-muted-foreground font-medium mb-10">
-                <p className="text-xl text-foreground font-bold mb-10 leading-relaxed"><T>{experience.description}</T></p>
-                
-                <h3 className="text-2xl font-black font-bricolage text-foreground mb-6 flex items-center gap-3">
-                  <div className="p-2 bg-accent/20 rounded-xl"><Utensils className="w-6 h-6 text-accent" strokeWidth={2.5} /></div>
-                  <T>El Menú (Incluye)</T>
-                </h3>
-                <ul className="space-y-4 mb-10 list-none pl-0">
-                  {experience.included_general?.map((item: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
-                      <span className="text-foreground"><T>{item}</T></span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="space-y-12">
+                <section>
+                  <h3 className="text-[11px] font-bold tracking-[0.2em] uppercase text-secondary mb-6"><T>La Experiencia</T></h3>
+                  <p className="text-lg text-muted-foreground font-light leading-relaxed whitespace-pre-line">
+                    {experience.description}
+                  </p>
+                </section>
 
-                <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 mb-8 flex flex-col gap-5">
-                  <div className="flex items-center gap-4 text-foreground font-bold">
-                    <div className="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center"><Clock className="w-5 h-5 text-primary" strokeWidth={2.5}/></div>
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/30 p-8 rounded-[var(--radius)] border border-border/50">
+                  <div className="flex items-center gap-4">
+                    <Clock className="w-5 h-5 text-primary" />
                     <div>
-                      <span className="block text-xs uppercase tracking-widest text-muted-foreground"><T>Duración</T></span>
-                      <T>{experience.duration || ""}</T>
+                      <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground"><T>Duración</T></p>
+                      <p className="text-sm font-medium text-foreground">{experience.duration}</p>
                     </div>
                   </div>
-                  {experience.important_info?.["Horario de inicio"] && (
-                    <div className="flex items-center gap-4 text-foreground font-bold">
-                      <div className="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center"><Clock className="w-5 h-5 text-primary" strokeWidth={2.5}/></div>
-                      <div>
-                        <span className="block text-xs uppercase tracking-widest text-muted-foreground"><T>Iniciamos a las</T></span>
-                        <T>{experience.important_info["Horario de inicio"][0] || ""}</T>
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-4 text-foreground font-bold">
-                    <div className="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center"><MapPin className="w-5 h-5 text-primary" strokeWidth={2.5}/></div>
+                  <div className="flex items-center gap-4">
+                    <MapPin className="w-5 h-5 text-primary" />
                     <div>
-                      <span className="block text-xs uppercase tracking-widest text-muted-foreground"><T>Punto de Encuentro</T></span>
-                      <T>{experience.location}</T>
+                      <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground"><T>Encuentro</T></p>
+                      <p className="text-sm font-medium text-foreground">{experience.location}</p>
                     </div>
                   </div>
-                </div>
+                </section>
 
-                {experience.important_info?.Notas && (
-                  <div className="bg-primary/5 p-6 rounded-[2rem] border border-primary/20">
-                    <p className="font-bold text-primary text-sm uppercase tracking-widest mb-2"><T>A tomar en cuenta</T></p>
-                    {experience.important_info.Notas.map((nota: string, i: number) => (
-                      <p key={i} className="mb-2 text-sm text-foreground/80 font-medium flex gap-2"><span className="text-primary">•</span> <T>{nota}</T></p>
+                <section>
+                  <h3 className="text-2xl font-serif text-foreground mb-8"><T>Inclusiones</T></h3>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {experience.included_general?.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-4 h-4 text-secondary shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
                     ))}
-                  </div>
-                )}
+                  </ul>
+                </section>
               </div>
             </div>
 
-            {/* Columna Derecha: Módulo de Reserva Juguetón */}
-            <div className="w-full lg:w-5/12 sticky top-32 animate-bounce-up delay-200">
-              
-              <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] border border-slate-100">
-                <h3 className="text-3xl font-black font-bricolage text-foreground mb-8 tracking-tight"><T>Reserva tu lugar</T></h3>
+            {/* Sidebar de Reserva (Derecha) */}
+            <div className="w-full lg:w-5/12">
+              <div className="sticky top-32 bg-white p-10 rounded-[var(--radius)] border border-border shadow-sm">
+                <h3 className="text-2xl font-serif text-foreground mb-8 text-center"><T>Reservar Expedición</T></h3>
                 
-                {/* Tabla de Precios convertida en "Opciones de Volumen" */}
-                <div className="mb-10">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4 block"><T>Inversión por paladar</T></label>
-                  <div className="space-y-3">
-                    {experience.packages?.map((pkg: ActivityPackage) => (
-                      <div 
-                        key={pkg.id} 
-                        onClick={() => setPax(pkg.min_pax)} 
-                        className={`flex justify-between items-center p-4 rounded-2xl cursor-pointer transition-all border-2 ${selectedPackage?.id === pkg.id ? 'bg-primary/5 border-primary shadow-sm' : 'bg-white border-slate-100 hover:border-slate-300'}`}
-                      >
-                        <div className="font-bold text-foreground"><T>{pkg.package_name}</T></div>
-                        <div className={`font-black text-lg ${selectedPackage?.id === pkg.id ? 'text-primary' : 'text-foreground'}`}>
-                          {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits:0 }).format(pkg.price)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Controles de Reserva */}
-                <div className="space-y-8">
-                  
+                <div className="space-y-6">
+                  {/* Selector de Fecha */}
                   <div>
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 block"><T>¿Cuándo nos vemos?</T></label>
-                    <div className="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-5 h-16 focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
-                      <CalendarIcon className="w-6 h-6 text-primary mr-3" />
-                      <input 
-                        type="date" 
-                        className="w-full bg-transparent outline-none text-foreground font-bold text-lg"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        min={new Date().toISOString().split("T")[0]}
-                      />
-                    </div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block"><T>Fecha</T></label>
+                    <input 
+                      type="date" 
+                      className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary outline-none transition-all font-medium"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      min={new Date().toISOString().split("T")[0]}
+                    />
                   </div>
 
-                  <div className="flex gap-6 items-end">
-                    <div className="w-1/3">
-                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 block"><T>Comensales</T></label>
+                  {/* Selector de Personas */}
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block"><T>Comensales</T></label>
+                    <div className="flex items-center border border-border rounded-xl overflow-hidden">
+                      <button onClick={() => setPax(Math.max(1, pax - 1))} className="px-4 py-3 hover:bg-muted transition-colors text-foreground">-</button>
                       <input 
                         type="number" 
-                        min={1} 
-                        value={pax} 
-                        onChange={(e) => setPax(parseInt(e.target.value) || 1)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl text-center text-2xl font-black h-16 outline-none focus:ring-2 focus:ring-primary transition-all text-foreground" 
+                        value={pax}
+                        readOnly
+                        className="w-full text-center bg-transparent text-sm font-bold text-foreground outline-none"
                       />
+                      <button onClick={() => setPax(pax + 1)} className="px-4 py-3 hover:bg-muted transition-colors text-foreground">+</button>
                     </div>
-                    
+                  </div>
+
+                  {/* Paquete detectado */}
+                  {selectedPackage && (
+                    <div className="py-4 border-t border-b border-border/50">
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{selectedPackage.package_name}</p>
+                          <p className="text-xs text-muted-foreground"><T>Precio por persona</T></p>
+                        </div>
+                        <p className="text-xl font-serif text-foreground">
+                          {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(selectedPackage.price)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Total y Acción */}
+                  <div className="pt-4">
+                    <div className="flex justify-between items-center mb-6">
+                      <span className="text-xs font-bold uppercase tracking-[0.2em] text-foreground"><T>Total</T></span>
+                      <span className="text-3xl font-serif text-primary">
+                        {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format((selectedPackage?.price || 0) * pax)}
+                      </span>
+                    </div>
+                    <p className="text-[9px] text-right uppercase tracking-widest text-muted-foreground mb-6">
+                      <T> IVA Incluido</T>
+                    </p>
                     <button 
                       onClick={handleAddToCart}
                       disabled={!selectedDate}
-                      className="btn-3d flex-1 bg-primary text-white h-16 rounded-2xl font-black text-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-foreground text-background py-4 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-primary transition-all duration-500 disabled:opacity-30 flex items-center justify-center gap-3 group"
                     >
-                      <T>Añadir</T>
+                      <T>Añadir a la Bolsa</T>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
-                  
-                  {selectedPackage && (
-                     <div className="bg-slate-900 p-6 rounded-[2rem] flex justify-between items-center text-white mt-8 shadow-xl shadow-slate-900/20">
-                        <span className="font-bold uppercase tracking-widest text-xs opacity-80"><T>Total estimado</T></span>
-                        <span className="text-3xl font-black font-bricolage text-accent">
-                          {new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(selectedPackage.price * pax)}
-                        </span>
-                     </div>
-                  )}
-
                 </div>
               </div>
-              
             </div>
 
           </div>

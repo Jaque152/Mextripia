@@ -13,7 +13,6 @@ DROP TABLE IF EXISTS public.categories_mextripia CASCADE;
 DROP TABLE IF EXISTS public.customers_mextripia CASCADE;
 DROP TABLE IF EXISTS public.contact_messages_mextripia CASCADE;
 DROP TABLE IF EXISTS public.custom_quotes_mextripia CASCADE;
-DROP TABLE IF EXISTS public.fifa_experiences_mextripia CASCADE;
 
 -- =====================================================================================
 -- 2. CREACIÓN DE TABLAS ESTANDARIZADAS
@@ -122,23 +121,12 @@ CREATE TABLE public.booking_items_mextripia (
   unit_price NUMERIC NOT NULL
 );
 
-CREATE TABLE public.fifa_experiences_mextripia (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR NOT NULL,
-  subtitle VARCHAR,
-  description TEXT,
-  items JSONB DEFAULT '[]'::jsonb,
-  image_url TEXT,
-  order_index INTEGER DEFAULT 0
-);
-
 -- =====================================================================================
 -- 3. POLÍTICAS DE SEGURIDAD RLS
 -- =====================================================================================
 ALTER TABLE public.categories_mextripia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activities_mextripia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_packages_mextripia ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.fifa_experiences_mextripia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.customers_mextripia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings_mextripia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.booking_items_mextripia ENABLE ROW LEVEL SECURITY;
@@ -149,7 +137,6 @@ ALTER TABLE public.cart_items_mextripia ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Lectura pública catálogos" ON public.categories_mextripia FOR SELECT USING (true);
 CREATE POLICY "Lectura pública actividades" ON public.activities_mextripia FOR SELECT USING (true);
 CREATE POLICY "Lectura pública paquetes" ON public.activity_packages_mextripia FOR SELECT USING (true);
-CREATE POLICY "Lectura pública fifa" ON public.fifa_experiences_mextripia FOR SELECT USING (true);
 CREATE POLICY "Acceso total a clientes en checkout" ON public.customers_mextripia FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Acceso total a reservas en checkout" ON public.bookings_mextripia FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Acceso total a items de reserva" ON public.booking_items_mextripia FOR ALL USING (true) WITH CHECK (true);
@@ -167,14 +154,14 @@ INSERT INTO public.categories_mextripia (name, slug) VALUES
 ('Rutas Tradicionales', 'rutas-tradicionales');
 
 -- =====================================================================================
--- 5. INSERTAR 19 EXPERIENCIAS GASTRONÓMICAS (Con imágenes contextualmente precisas)
+-- 5. INSERTAR 19 EXPERIENCIAS GASTRONÓMICAS
 -- =====================================================================================
 INSERT INTO public.activities_mextripia (title, slug, category_id, location, duration, description, images, included_general, important_info) VALUES
 (
   'Plan Gastronómico "Sabor Local" y Tour San Rafael & Mercado Tacuba', 
   'sabor-local-san-rafael', 1, 'Entrada principal del Mercado San Rafael', '3 horas aproximadamente', 
   'Descubre los sabores auténticos de la Ciudad de México con nuestro recorrido guiado por los mercados más tradicionales. Este tour incluye degustaciones de antojitos, bebidas locales, productos artesanales y un acercamiento a la cultura culinaria del corazón de la ciudad.',
-  '["https://images.pexels.com/photos/12016567/pexels-photo-12016567.jpeg"]'::jsonb, -- Colorful Mexican market stall
+  '["https://images.pexels.com/photos/12016567/pexels-photo-12016567.jpeg"]'::jsonb,
   '["Guía gastronómico experto.", "Degustaciones en 5-7 puestos seleccionados del mercado.", "Bebidas típicas de la zona.", "Experiencia cultural y breve historia de los mercados visitados.", "Mapa y recomendaciones para seguir explorando por tu cuenta."]'::jsonb,
   '{"Horario de inicio": ["10:00 a.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado; en caso de requerirse, tendrá un costo adicional."]}'::jsonb
 ),
@@ -182,7 +169,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Cocina Abierta Mexicana" y Tour Gourmet CDMX', 
   'cocina-abierta-gourmet', 1, 'Lobby del restaurante principal designado', '3 horas aproximadamente', 
   'Sumérgete en los sabores contemporáneos y tradicionales de la Ciudad de México con nuestro recorrido guiado por restaurantes y bares de cocina abierta. Este tour incluye degustaciones de platillos gourmet, bebidas típicas, y la oportunidad de ver a los chefs en acción.',
-  '["https://images.pexels.com/photos/25389276/pexels-photo-25389276.jpeg"]'::jsonb, -- Modern Mexican restaurant plating
+  '["https://images.pexels.com/photos/25389276/pexels-photo-25389276.jpeg"]'::jsonb,
   '["Guía gastronómico especializado en cocina mexicana.", "Degustaciones en 1-2 restaurantes y bares seleccionados.", "Bebidas tradicionales y cocteles artesanales.", "Experiencia interactiva con chefs y explicación de la preparación de platillos.", "Mapa y recomendaciones para continuar explorando la escena gastronómica."]'::jsonb,
   '{"Horario de inicio": ["6:30 p.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -190,7 +177,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Sabor Local" – Master Class de Churros', 
   'master-class-churros', 2, 'Dirección proporcionada una vez realizada la reserva', '2 horas aproximadamente', 
   'Sumérgete en el arte de la repostería mexicana con nuestra exclusiva Master Class de Churros. Guiados por un chef pastelero local, aprenderás a preparar churros auténticos con técnicas tradicionales, acompañados de una deliciosa ganache mexicana.',
-  '["https://images.pexels.com/photos/4374015/pexels-photo-4374015.jpeg"]'::jsonb, -- Hands frying churros
+  '["https://images.pexels.com/photos/4374015/pexels-photo-4374015.jpeg"]'::jsonb,
   '["Clase práctica dirigida por un chef pastelero mexicano.", "Preparación de churros tradicionales y ganache mexicana.", "Degustación de tus propios churros acompañados de café artesanal.", "Recetas y consejos para replicar en casa.", "Ambiente íntimo y personalizado."]'::jsonb,
   '{"Horarios disponibles": ["Mañana: 10:00 a.m.", "Tarde: 4:00 p.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -198,7 +185,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Fiesta Xochimilca" y Tour Cultural y Degustación en Trajinera', 
   'fiesta-xochimilca-trajinera', 4, 'Embarcadero Las Flores Nativitas, Xochimilco', 'Aproximadamente 2 horas', 
   'Embárcate en una experiencia única en los canales de Xochimilco, donde la tradición se mezcla con la diversión. Disfruta de una fiesta a bordo de una trajinera, degustando tequila, mezcal y cócteles artesanales, mientras participas en juegos interactivos y karaoke.',
-  '["https://images.pexels.com/photos/27090423/pexels-photo-27090423.jpeg"]'::jsonb, -- Colorful trajineras on Xochimilco canal
+  '["https://images.pexels.com/photos/27090423/pexels-photo-27090423.jpeg"]'::jsonb,
   '["Recorrido en trajinera por los canales de Xochimilco.", "Degustación ilimitada de tequila, mezcal y cócteles artesanales.", "Snacks mexicanos tradicionales.", "Juegos interactivos y karaoke.", "Guía local experto en cultura y traditions."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preferencia del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -206,7 +193,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Ranchero Capitalino" y Paseo a Caballo y Barbacoa en el Ajusco', 
   'ranchero-capitalino-ajusco', 4, 'Recogida en tu alojamiento en la Ciudad de México', 'Aproximadamente 6 horas', 
   'Escápate del bullicio urbano y vive una experiencia ecuestre única en el Parque Nacional Ajusco. Este tour privado te llevará por senderos montañosos rodeados de naturaleza. Al finalizar el paseo, deleitarás tu paladar con una auténtica barbacoa ranchera.',
-  '["https://images.pexels.com/photos/11153859/pexels-photo-11153859.jpeg"]'::jsonb, -- Horseback riding in Mexican landscape
+  '["https://images.pexels.com/photos/11153859/pexels-photo-11153859.jpeg"]'::jsonb,
   '["Guía experto en equitación y naturaleza.", "Caballos bien entrenados y equipo de seguridad.", "Recorrido por senderos del Parque Nacional Ajusco.", "Almuerzo de barbacoa con carne, guarniciones y vino.", "Tiempo libre para disfrutar del entorno natural."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preferencia del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -214,7 +201,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Aventura Pirata" y Sunset Dinner & Show en Los Cabos', 
   'aventura-pirata-cabos', 3, 'Marina de Cabo San Lucas', 'Aproximadamente 2.5 a 3 horas', 
   'Embárcate en una experiencia única en Los Cabos con nuestro tour en barco pirata al atardecer. Disfruta de una cena a bordo mientras contemplas la puesta de sol sobre el Mar de Cortés, acompañado de un show interactivo con música, entretenimiento y animación pirata.',
-  '["https://images.pexels.com/photos/5769594/pexels-photo-5769594.jpeg"]'::jsonb, -- Wooden pirate galleon on water at sunset
+  '["https://images.pexels.com/photos/5769594/pexels-photo-5769594.jpeg"]'::jsonb,
   '["Guía y tripulación profesional a bordo.", "Cena buffet con especialidades locales e internacionales.", "Bebidas incluidas (refrescos, agua y selección de cocteles).", "Show en vivo con animación pirata, música y entretenimiento.", "Experiencia de navegación al atardecer con vistas panorámicas."]'::jsonb,
   '{"Horario de inicio": ["Salida al atardecer (aproximadamente 6:00 p.m.)"], "Notas": ["El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -222,7 +209,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Sabores Nocturnos" y Tour Nocturno en San Miguel de Allende', 
   'sabores-nocturnos-san-miguel', 1, 'Hotel Boutique Cantera 1910, Zona Centro', 'Aproximadamente 3 horas', 
   'Embárcate en un recorrido culinario nocturno de 3 horas por el corazón de San Miguel de Allende. Visita siete paradas gastronómicas cuidadosamente seleccionadas, donde podrás degustar platos emblemáticos de la cocina mexicana, preparados por chefs galardonados.',
-  '["https://images.pexels.com/photos/13768992/pexels-photo-13768992.jpeg"]'::jsonb, -- Ambient shot of colonial streets in San Miguel de Allende at night
+  '["https://images.pexels.com/photos/13768992/pexels-photo-13768992.jpeg"]'::jsonb,
   '["Guía experto en gastronomía y cultura local.", "Degustaciones en 3 establecimientos seleccionados.", "Platos representativos como ensalada de remolacha, chile en nogada, taco de jícama.", "Información sobre la historia culinaria y arquitectónica."]'::jsonb,
   '{"Horario de inicio": ["6:00 p.m."], "Notas": ["El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -230,7 +217,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico Clase de Cocina Mexicana en San Miguel de Allende', 
   'clase-cocina-mexicana-san-miguel', 2, 'Dirección proporcionada al confirmar la reserva', 'Aproximadamente 3 horas', 
   'Sumérgete en la rica tradición culinaria de México con esta clase práctica en San Miguel de Allende. Aprenderás a preparar mole auténtico, enmoladas y arroz mexicano, guiado por un chef experto. Al finalizar, disfrutarás de una comida completa acompañada de vino regional.',
-  '["https://images.pexels.com/photos/34732196/pexels-photo-34732196.jpeg"]'::jsonb, -- Preparing Mexican food
+  '["https://images.pexels.com/photos/34732196/pexels-photo-34732196.jpeg"]'::jsonb,
   '["Clase de cocina impartida por un chef profesional.", "Preparación de mole, enmoladas y arroz mexicano.", "Comida completa con los platillos preparados.", "Vino regional y bebida de cacao.", "Recetas para llevar a casa."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preferencia del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -238,7 +225,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Tacos y Tequila” Recorrido Gastronómico a Pie', 
   'tacos-tequila-san-miguel', 1, 'Se confirmará una vez que esté lista la reserva.', 'Aproximadamente 3.5 horas', 
   'Embárcate en un recorrido culinario de 3.5 horas por el corazón de San Miguel de Allende, explorando cinco paradas gastronómicas seleccionadas. Disfruta de tacos gourmet y cócteles innovadores como margaritas de jalapeño, mientras aprendes sobre la historia y cultura de la ciudad.',
-  '["https://images.pexels.com/photos/33614203/pexels-photo-33614203.jpeg"]'::jsonb, -- Modern gourmet tacos and a margarita
+  '["https://images.pexels.com/photos/33614203/pexels-photo-33614203.jpeg"]'::jsonb,
   '["Guía experto en gastronomía y cultura local.", "Degustaciones en 3 establecimientos seleccionados.", "Tres cócteles innovadores, incluyendo margarita de jalapeño.", "Información sobre la historia culinaria de San Miguel de Allende.", "Grupo pequeño limitado a 10 personas."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preference del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -246,7 +233,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Sabores de Oaxaca” Experiencia Culinaria Tradicional', 
   'sabores-oaxaca-experiencia', 4, 'Dirección proporcionada al confirmar la reserva.', 'Aproximadamente 5 horas', 
   'Sumérgete en la rica tradición culinaria de Oaxaca con esta experiencia práctica de 5 horas. Bajo la guía de cocineras locales, aprenderás a preparar platos emblemáticos utilizando métodos ancestrales y utensilios tradicionales.',
-  '["https://images.pexels.com/photos/12983263/pexels-photo-12983263.jpeg"]'::jsonb, -- Oaxacan comal cooking tlayudas
+  '["https://images.pexels.com/photos/12983263/pexels-photo-12983263.jpeg"]'::jsonb,
   '["Guía experto en gastronomía local.", "Visita a un mercado local para seleccionar ingredientes frescos.", "Elaboración de tortillas, empanadas y quesadillas.", "Preparación de sopas y moles tradicionales.", "Postre tradicional oaxaqueño."]'::jsonb,
   '{"Horario de inicio": ["9:00 a.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -254,7 +241,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Raíces del Agave” y Tour de Mezcal Ancestral', 
   'raices-agave-mezcal-puerto-escondido', 4, 'Recogida en tu alojamiento en Puerto Escondido.', 'Aproximadamente 2 horas y 30 minutos', 
   'Sumérgete en la tradición oaxaqueña con una visita guiada a una destilería ancestral de mezcal. Descubre el proceso artesanal de producción del mezcal, desde la cocción del agave hasta la destilación en alambiques de cobre.',
-  '["https://images.pexels.com/photos/32912641/pexels-photo-32912641.jpeg"]'::jsonb, -- Rustic mezcal tasting setup
+  '["https://images.pexels.com/photos/32912641/pexels-photo-32912641.jpeg"]'::jsonb,
   '["Recorrido guiado por la destilería ancestral.", "Cata de cinco mezcales artesanales.", "Botanas locales: guacamole, cacahuates, chapulines y más.", "Presentación didáctica sobre el origen y proceso del mezcal."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preferencia del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -262,7 +249,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Aventura Mexicana” y Paseo a Caballo y Degustación de Tequila', 
   'aventura-mexicana-caballo-tequila', 4, 'Recogida en tu alojamiento en Puerto Vallarta.', 'Aproximadamente 5 horas', 
   'Embárcate en una experiencia única en Puerto Vallarta que combina la belleza natural de la Sierra Madre con la rica tradición mexicana. Este tour incluye un paseo a caballo por senderos selváticos, una refrescante parada en el río Cuale, una degustación de tequilas y una comida tradicional.',
-  '["https://images.pexels.com/photos/16068120/pexels-photo-16068120.jpeg"]'::jsonb, -- Horseback riders crossing a river in a lush environment
+  '["https://images.pexels.com/photos/16068120/pexels-photo-16068120.jpeg"]'::jsonb,
   '["Paseo guiado a caballo por la Sierra Madre.", "Oportunidad de nadar con los caballos en el río Cuale (según condiciones).", "Degustación de tequilas artesanales boutique.", "Comida tradicional mexicana."]'::jsonb,
   '{"Horario de inicio": ["10:30 a.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -270,7 +257,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Navegando Sabores” y Tour de Lujo en Yate y Snorkel', 
   'navegando-sabores-yate-snorkel', 3, 'Terminal Marítima, Puerto Vallarta', 'Aproximadamente 5 horas', 
   'Embárcate en una experiencia exclusiva por la Bahía de Banderas a bordo de un elegante catamarán Leopard. Disfruta de actividades acuáticas como snorkel y paddleboard en la playa Majahuitas, mientras degustas un delicioso almuerzo mexicano acompañado de barra libre premium.',
-  '["https://images.pexels.com/photos/29318855/pexels-photo-29318855.jpeg"]'::jsonb, -- Sleek luxury yacht in turquoise Caribbean water
+  '["https://images.pexels.com/photos/29318855/pexels-photo-29318855.jpeg"]'::jsonb,
   '["Crucero en catamarán Leopard con tripulación profesional.", "Equipo de snorkel y paddleboard.", "Almuerzo mexicano con guacamole, cócteles de camarones y fruta fresca.", "Traslado de ida y vuelta desde tu alojamiento en Puerto Vallarta."]'::jsonb,
   '{"Horario de inicio": ["8:00 a.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -278,7 +265,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Amanecer en la Selva” y Desayuno Flotante Privado', 
   'amanecer-selva-desayuno-flotante', 3, 'Recogida en tu alojamiento en Cancún.', 'Aproximadamente 6 horas', 
   'Comienza tu día de manera única con un desayuno flotante privado en el corazón de la selva maya. Esta experiencia exclusiva te permite disfrutar de una bandeja gourmet en la piscina, rodeado de la tranquilidad de la naturaleza. Incluye también una sesión de temazcal.',
-  '["https://images.pexels.com/photos/8414483/pexels-photo-8414483.jpeg"]'::jsonb, -- Luxury jungle pool with floating breakfast tray
+  '["https://images.pexels.com/photos/8414483/pexels-photo-8414483.jpeg"]'::jsonb,
   '["Desayuno flotante gourmet: huevos, chilaquiles, frijoles, café, pan bagel con frutas.", "Sesión guiada de meditación en temazcal (20-25 minutos).", "Acceso a áreas comunes del hotel de 9:00 a.m. a 6:00 p.m.", "Bebida de bienvenida (coctel de autor)."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preferencia del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -286,7 +273,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Sabor Maya” y Clase de Cocina en Playa del Carmen', 
   'sabor-maya-clase-cocina', 2, '50 Avenida Nte., Ejidal, Playa del Carmen', 'Aproximadamente 3 horas', 
   'Sumérgete en la auténtica cocina mexicana con esta clase práctica en Playa del Carmen. Guiado por la chef Alma, aprenderás a preparar platillos tradicionales como tortillas hechas a mano, salsas frescas y guacamole, utilizando ingredientes locales frescos.',
-  '["https://images.pexels.com/photos/8477297/pexels-photo-8477297.jpeg"]'::jsonb, -- Preparing Mexican ingredients
+  '["https://images.pexels.com/photos/8477297/pexels-photo-8477297.jpeg"]'::jsonb,
   '["Clase de cocina impartida por chef profesional.", "Visita al mercado local para seleccionar ingredientes frescos.", "Preparación de tortillas, salsas y guacamole.", "Almuerzo con los platillos preparados.", "Recetas familiares para llevar a casa."]'::jsonb,
   '{"Horario de inicio": ["10:00 a.m."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -294,7 +281,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Sabores Locales” en Cancún', 
   'sabores-locales-cancun', 1, 'Recogida en tu alojamiento en Cancún.', 'Aproximadamente 4 horas y 30 minutos', 
   'Embárcate en un recorrido de medio día por el corazón de Cancún, explorando mercados locales, puestos de comida callejera y callejones llenos de arte urbano. Este tour te permitirá degustar una variedad de especialidades locales, como barbacoa y tacos.',
-  '["https://images.pexels.com/photos/12319830/pexels-photo-12319830.jpeg"]'::jsonb, -- Authentic night taco stall in Cancun
+  '["https://images.pexels.com/photos/12319830/pexels-photo-12319830.jpeg"]'::jsonb,
   '["Guía local experto en gastronomía y cultura.", "Degustaciones en varios puestos de comida y mercados locales.", "Visita a murales y arte urbano en callejones ocultos.", "Información sobre la historia y tradiciones culinarias de Cancún."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preference del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -302,7 +289,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico “Paraíso Privado” Club de Playa de Lujo en Costa Maya', 
   'paraiso-privado-club-playa-costa-maya', 3, 'Puerto de cruceros de Costa Maya.', 'Aproximadamente 4 horas y 30 minutos', 
   'Escapa de las multitudes y disfruta de una experiencia exclusiva en la Costa Maya. Este tour ofrece acceso a un club de playa privado donde podrás relajarte en tu propio deck con baño y ducha privados, mientras disfrutas de un servicio personalizado de alimentos y bebidas.',
-  '["https://images.pexels.com/photos/21856213/pexels-photo-21856213.jpeg"]'::jsonb, -- Overwater hammocks at a luxury beach club
+  '["https://images.pexels.com/photos/21856213/pexels-photo-21856213.jpeg"]'::jsonb,
   '["Acceso a un deck privado con baño y ducha.", "Servicio personalizado de alimentos y bebidas.", "Actividades acuáticas: snorkel, kayak y paddleboard.", "Actividades terrestres: juegos de mesa, fútbol y voleibol."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según la llegada del crucero."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 ),
@@ -310,7 +297,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Navegando Sabores" y Tour Privado en Yate a Isla Mujeres', 
   'yate-privado-isla-mujeres', 3, 'Recogida en tu alojamiento en Cancún.', 'Aproximadamente 4 horas', 
   'Embárcate en una experiencia exclusiva a bordo de un yate privado de 42 pies, navegando por las aguas cristalinas del Caribe mexicano. Este tour personalizado incluye un recorrido por la laguna Nichupté, una parada para snorkel en Isla Mujeres y una deliciosa comida a bordo.',
-  '["https://images.pexels.com/photos/15304502/pexels-photo-15304502.jpeg"]'::jsonb, -- Private yacht anchored in turquoise Caribbean water
+  '["https://images.pexels.com/photos/15304502/pexels-photo-15304502.jpeg"]'::jsonb,
   '["Recorrido en yate privado de 42 pies.", "Parada para snorkel en Isla Mujeres.", "Comida a bordo (ceviche fresco)."]'::jsonb,
   '{"Horario de inicio": ["Flexible, según preference del cliente."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés.", "El servicio de transporte no está contemplado."]}'::jsonb
 ),
@@ -318,7 +305,7 @@ INSERT INTO public.activities_mextripia (title, slug, category_id, location, dur
   'Plan Gastronómico "Ritmos del Mar" y Crucero al Atardecer con Cena y Show Nocturno', 
   'ritmos-del-mar-crucero-vallarta', 3, 'Terminal Marítima de Puerto Vallarta', 'Aproximadamente 5 horas', 
   'Embárcate en una experiencia única en Puerto Vallarta con un elegante crucero al atardecer por la Bahía de Banderas. Disfruta de una cena buffet a la luz de las velas en la playa privada de Las Caletas, acompañada de música en vivo y un espectáculo nocturno.',
-  '["https://images.pexels.com/photos/11762658/pexels-photo-11762658.jpeg"]'::jsonb, -- Candlelit dinner setup on a secluded beach at night under lights
+  '["https://images.pexels.com/photos/11762658/pexels-photo-11762658.jpeg"]'::jsonb,
   '["Crucero al atardecer en catamarán desde Puerto Vallarta.", "Cena buffet internacional a la luz de las velas en la playa.", "Espectáculo nocturno \"Ritmos del Mar\" con música, danza y acrobacias.", "Barra libre nacional (bebidas alcohólicas y no alcohólicas)."]'::jsonb,
   '{"Horario de inicio": ["17:00 h (hora local)."], "Notas": ["Todos nuestros servicios turísticos ofrecen guía español e inglés."]}'::jsonb
 );
@@ -424,10 +411,3 @@ INSERT INTO public.activity_packages_mextripia (activity_id, package_name, price
 ((SELECT id FROM public.activities_mextripia WHERE slug='ritmos-del-mar-crucero-vallarta'), '1 - 3 personas', 5800.00, 1, 3),
 ((SELECT id FROM public.activities_mextripia WHERE slug='ritmos-del-mar-crucero-vallarta'), '4 - 6 personas', 5600.00, 4, 6),
 ((SELECT id FROM public.activities_mextripia WHERE slug='ritmos-del-mar-crucero-vallarta'), '7+ personas', 5430.00, 7, 20);
-
--- =====================================================================================
--- 7. INSERTAR DETALLES MUNDIAL
--- =====================================================================================
-INSERT INTO public.fifa_experiences_mextripia (title, subtitle, description, items, image_url, order_index) VALUES
-('Experiencias Culinarias VIP', 'Acceso Exclusivo', 'Degustaciones de alto nivel en recintos privados durante los partidos clave.', '["Cenas maridaje con chefs reconocidos", "Acceso a zonas VIP", "Servicio de mixología de autor"]', 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070', 1),
-('Viewing Parties Gourmet', 'Eventos en Vivo', 'Proyección de partidos en entornos de lujo con catering ininterrumpido.', '["Pantallas gigantes 4K", "Estaciones de comida en vivo", "Ambiente selecto y privado"]', 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070', 2);
