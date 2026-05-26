@@ -195,7 +195,7 @@ function CheckoutContent() {
               <div className="flex items-end justify-between mb-8 border-b border-border pb-2">
                 <h2 className="text-2xl font-serif text-foreground"><T>Información de Pago</T></h2>
                 <div className="h-6 opacity-60">
-                   <img src="/logo-keycop-2.png" alt="Powered by Keycop" className="h-full object-contain grayscale" />
+                   <img src="/logo-octano-2.png" alt="Powered by Octano" className="h-full object-contain grayscale" />
                 </div>
               </div>
 

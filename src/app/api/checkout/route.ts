@@ -7,31 +7,32 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// --- CREDENCIALES KEYCOP ---
-const KEYCOP_EMAIL = process.env.KEYCOP_EMAIL!;
-const KEYCOP_PASSWORD = process.env.KEYCOP_PASSWORD!;
-const KEYCOP_BASE_URL = 'https://pagos.keycop.com.mx/api/v1';
+// --- CREDENCIALES OCTANO ---
+const OCTANO_EMAIL = process.env.OCTANO_EMAIL!;
+const OCTANO_PASSWORD = process.env.OCTANO_PASSWORD!;
+const OCTANO_BASE_URL = process.env.OCTANO_BASE_URL!;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const formatPrice = (price: number) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(price);
 
-const getKeycopHeaders = (extraHeaders = {}) => ({
+const getOctanoHeaders = (extraHeaders = {}) => ({
   'Content-Type': 'application/json',
   'Accept': 'application/json',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0 Safari/537.36',
   'Origin': 'https://mextripia.com', 
+  'Referer': 'https://mextripia.com/',
   ...extraHeaders
 });
 
-async function safeKeycopFetch(url: string, options: RequestInit, stepName: string) {
+async function safeOctanoFetch(url: string, options: RequestInit, stepName: string) {
   const res = await fetch(url, options);
   const text = await res.text(); 
   
   try {
     return JSON.parse(text);
   } catch (e) {
-    console.error(`Respuesta cruda de Keycop en [${stepName}]:`, text);
-    throw new Error(`Falla en ${stepName}. Keycop respondió: ${text.slice(0, 50)}...`);
+    console.error(`Respuesta cruda de Octano en [${stepName}]:`, text);
+    throw new Error(`Falla en ${stepName}. Octano respondió de forma inesperada.`);
   }
 }
 
@@ -42,45 +43,48 @@ export async function POST(req: Request) {
 
     const tempReferenceId = `REF-${Date.now()}`;
 
-    // 1. SIGNIN EN KEYCOP
-    const signinData = await safeKeycopFetch(`${KEYCOP_BASE_URL}/signin`, {
+    // 1. SIGNIN EN OCTANO
+    const signinData = await safeOctanoFetch(`${OCTANO_BASE_URL}/signin`, {
       method: 'POST',
-      headers: getKeycopHeaders(),
-      body: JSON.stringify({ email: KEYCOP_EMAIL, password: KEYCOP_PASSWORD })
-    }, 'Login Keycop');
+      headers: {
+        ...getOctanoHeaders(),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ email: OCTANO_EMAIL, password: OCTANO_PASSWORD }).toString()
+    }, 'Login Octano');
     
     if (!signinData.authToken) {
-      throw new Error("Credenciales de Keycop incorrectas o bloqueadas.");
+      throw new Error("Credenciales de OctanoApi incorrectas o bloqueadas.");
     }
     const authToken = signinData.authToken;
 
-    // 2. TOKENIZACIÓN DE TARJETA KEYCOP
+    // 2. TOKENIZACIÓN DE TARJETA OCTANO
     const cardPayload = {
       cardData: {
-        cardNumber: cardInfo.number,
+        cardNumber: cardInfo.number.replace(/\s+/g, ''),
         cardholderName: cardInfo.name,
-        expirationMonth: cardInfo.expiry.split('/')[0],
-        expirationYear: cardInfo.expiry.split('/')[1],
+        expirationMonth: cardInfo.expiry.split('/')[0].trim(),
+        expirationYear: cardInfo.expiry.split('/')[1].trim(),
       }
     };
 
-    const tokenData = await safeKeycopFetch(`${KEYCOP_BASE_URL}/card/tokenizer`, {
+    const tokenData = await safeOctanoFetch(`${OCTANO_BASE_URL}/card/tokenizer`, {
       method: 'POST',
-      headers: getKeycopHeaders({ 'Authorization': `Bearer ${authToken}` }),
+      headers: getOctanoHeaders({ 'Authorization': `Bearer ${authToken}` }),
       body: JSON.stringify(cardPayload)
     }, 'Tokenización de Tarjeta');
 
     if (!tokenData.cardNumberToken) {
-      throw new Error("Tarjeta rechazada por Keycop (Datos inválidos o encriptación fallida).");
+      throw new Error("Tarjeta rechazada por Octano (Datos inválidos o encriptación fallida).");
     }
     const cardToken = tokenData.cardNumberToken;
 
     // 3. PREPARAR ITEMS PARA LA VENTA
-    const keycopItems = manualFolioData 
-      ? [{ title: `Pago Cotización: ${manualFolioData.folio}`, amount: manualFolioData.amount, quantity: 1, id: manualFolioData.folio }]
+    const octanoItems = manualFolioData 
+      ? [{ title: `Pago Cotización: ${manualFolioData.folio}`, amount: Number(manualFolioData.amount.toFixed(2)), quantity: 1, id: manualFolioData.folio }]
       : cart.items.map((item: CartItem) => ({
           title: item.experience.title,
-          amount: item.pricePerPerson,
+          amount: Number(item.pricePerPerson.toFixed(2)),
           quantity: item.people,
           id: item.packageId.toString(),
     }));
@@ -102,25 +106,25 @@ export async function POST(req: Request) {
         address1: billingInfo.direccion || 'Sin Especificar',
         postalCode: billingInfo.codigo_postal || '00000',
         state: billingInfo.estado || 'CDMX',
-        country: 'MX',
+        country: 'Mx',
         ip: '127.0.0.1' 
       },
       cardData: {
         cardNumberToken: cardToken,
         cvv: cardInfo.cvv
       },
-      items: keycopItems,
+      items: octanoItems,
       redirectUrl: 'https://mextripia.com' 
     };
 
-    const saleData = await safeKeycopFetch(`${KEYCOP_BASE_URL}/sale`, {
+    const saleData = await safeOctanoFetch(`${OCTANO_BASE_URL}/sale`, {
       method: 'POST',
-      headers: getKeycopHeaders({ 'Authorization': `Bearer ${authToken}` }),
+      headers: getOctanoHeaders({ 'Authorization': `Bearer ${authToken}` }),
       body: JSON.stringify(salePayload)
     }, 'Procesar Venta');
     
     if (saleData.status !== 'APPROVED' && saleData.status !== 'PENDING') {
-      console.error("❌ DETALLE DEL RECHAZO KEYCOP:", saleData); 
+      console.error("❌ DETALLE DEL RECHAZO OCTANO:", saleData); 
       throw new Error(`Pago declinado: ${saleData.message || saleData.responseCode || 'Tarjeta rechazada por el banco'}`);
     }
 
@@ -143,9 +147,9 @@ export async function POST(req: Request) {
         customer_id: customer.id,
         session_id: manualFolioData ? manualFolioData.folio : null,
         total_amount: finalAmountToCharge,
-        payment_status: 'paid',
+        payment_status: saleData.status === 'APPROVED' ? 'paid' : 'pending',
         transaction_id: saleData.transactionId || saleData.authorizationNumber || tempReferenceId,
-        payment_provider: 'keycop', 
+        payment_provider: 'octano', 
         payment_date: new Date().toISOString(),
         pais: billingInfo.pais,
         direccion: billingInfo.direccion,
@@ -174,7 +178,7 @@ export async function POST(req: Request) {
       }   
     }
    
-    // 6. CORREOS ELECTRÓNICOS (Estética Epicúreo)
+    // 6. CORREOS ELECTRÓNICOS 
     const bgDark = '#1B2B22'; // Forest Dark
     const bgLight = '#FAF9F6'; // Warm Pearl
     const primaryColor = '#C9A27E'; // Sand / Caramel
@@ -271,11 +275,11 @@ export async function POST(req: Request) {
     
     const htmlInternal = `
       <div style="font-family: Arial, sans-serif; color: #333;">
-        <h2 style="color: #4A5D23;">¡Nueva Reserva Confirmada! (Vía Keycop)</h2>
+        <h2 style="color: #4A5D23;">¡Nueva Reserva Confirmada! (Vía Octano)</h2>
         <p>Se ha procesado un pago exitoso a través de la plataforma Mextripia.</p>
         <hr/>
         <p><strong>Monto Total:</strong> ${formattedTotal}</p>
-        <p><strong>ID Transacción (Keycop):</strong> ${saleData.transactionId || saleData.authorizationNumber}</p>
+        <p><strong>ID Transacción (Octano):</strong> ${saleData.transactionId || saleData.authorizationNumber}</p>
         <hr/>
         <h3>Datos de Facturación:</h3>
         <p><strong>Nombre:</strong> ${contactInfo.firstName} ${contactInfo.lastName}</p>
@@ -303,6 +307,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       success: true, 
       bookingId: booking.id,
+      redirectTo: saleData.redirectTo || null
     });
 
   } catch (error: unknown) {
