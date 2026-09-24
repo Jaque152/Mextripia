@@ -194,9 +194,6 @@ function CheckoutContent() {
             <section>
               <div className="flex items-end justify-between mb-8 border-b border-border pb-2">
                 <h2 className="text-2xl font-serif text-foreground"><T>Información de Pago</T></h2>
-                <div className="h-6 opacity-60">
-                   <img src="/logo-octano-2.png" alt="Powered by Octano" className="h-full object-contain grayscale" />
-                </div>
               </div>
 
               <div className="bg-foreground text-background p-8 md:p-12 shadow-2xl relative overflow-hidden">
