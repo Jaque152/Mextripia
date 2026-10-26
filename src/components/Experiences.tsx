@@ -9,9 +9,9 @@ export function Experiences() {
   const locale = useLocale();
 
   const tours = [
-    { id: 1, title: "Travesía Prehispánica", location: "Oaxaca", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop" },
-    { id: 2, title: "El Arte del Agave", location: "Jalisco", image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop" },
-    { id: 3, title: "Brisas del Pacífico", location: "Riviera Nayarit", image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop" },
+    { id: 1, title: "Travesía Prehispánica", location: "Oaxaca", image: "https://images.unsplash.com/photo-1635788217034-7da0323933f3?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D?q=80&w=2070&auto=format&fit=crop" },
+    { id: 2, title: "El Arte del Agave", location: "Jalisco", image: "https://images.pexels.com/photos/16360721/pexels-photo-16360721.jpeg" },
+    { id: 3, title: "Brisas del Pacífico", location: "Riviera Nayarit", image: "https://images.unsplash.com/photo-1521165582142-eaf4bd77b3f6?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D?q=80&w=2070&auto=format&fit=crop" },
   ];
 
   return (

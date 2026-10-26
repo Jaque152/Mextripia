@@ -32,12 +32,12 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Imagen Derecha (Retrato Asimétrico con Parallax effect) */}
+          {/* Imagen Derecha */}
           <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen relative animate-fade-up delay-200">
-            {/* Contenedor que no toca los bordes en desktop, dando estilo de revista */}
+            {/* Contenedor que no toca los bordes */}
             <div className="absolute top-0 lg:top-[10%] right-0 lg:-right-[5%] w-full lg:w-[110%] h-full lg:h-[80%] overflow-hidden">
               <Image 
-                src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D?q=80&w=2070&auto=format&fit=crop" 
                 alt="Alta Gastronomía" 
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"

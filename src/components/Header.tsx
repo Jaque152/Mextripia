@@ -55,7 +55,7 @@ export function Header() {
 
           {/* Logo Central */}
           <Link href={`/${locale}/`} className="text-3xl md:text-4xl font-serif font-medium tracking-widest text-primary flex items-center justify-center">
-            Mextripia<span className="text-secondary text-5xl leading-none">.</span>
+            Mextripia
           </Link>
 
           {/* Acciones Derecha (Carrito e Idioma Desktop) */}
